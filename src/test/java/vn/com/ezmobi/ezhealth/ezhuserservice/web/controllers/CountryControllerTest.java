@@ -13,9 +13,11 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by ezmobivietnam on 2021-01-06.
@@ -40,10 +42,15 @@ class CountryControllerTest {
     @Test
     void findAll() throws Exception {
         // given
+        CountryDto vietname = CountryDto.builder().countryId(1).name("Vietnam").build();
+        CountryDto laos = CountryDto.builder().countryId(2).name("Laos").build();
         given(countryService.findAll())
-                .willReturn(List.of(CountryDto.builder().countryId(1).name("Vietnam").build()));
+                .willReturn(List.of(vietname, laos));
         //when
         mockMvc.perform(get("/api/v1/country/findAll").contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is(vietname.getName())))
+                .andExpect(jsonPath("$[1].name", is(laos.getName())));
     }
 }
