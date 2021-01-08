@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CountryDto {
-    private int countryId;
+    private int id;
     private String name;
     private LocalDateTime lastUpdate;
 }

@@ -9,5 +9,5 @@ import java.util.List;
 public interface CountryRepository
         extends JpaRepository<Country, Integer>, JpaSpecificationExecutor<Country> {
 
-    List<Country> findByNameIsLike(String pattern);
+    List<Country> findByNameContainingIgnoreCase(String pattern);
 }

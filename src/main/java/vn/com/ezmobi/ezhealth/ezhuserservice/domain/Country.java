@@ -16,7 +16,7 @@ public class Country implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "country_id", nullable = false)
-    private int countryId;
+    private int id;
 
     @Column(name = "country", nullable = false)
     private String name;

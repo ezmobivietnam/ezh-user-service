@@ -10,5 +10,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 @Mapper
 public interface CountryMapper {
     Country countryDtoToCountry(CountryDto countryDto);
+
     CountryDto countryToCountryDto(Country country);
 }

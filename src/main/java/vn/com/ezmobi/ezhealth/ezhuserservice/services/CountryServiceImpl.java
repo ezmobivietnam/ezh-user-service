@@ -48,7 +48,7 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public List<CountryDto> findByName(String exp) {
-        List<Country> countryList = countryRepository.findByNameIsLike(exp);
+        List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(exp);
         return countryList
                 .stream()
                 .map(countryMapper::countryToCountryDto)
