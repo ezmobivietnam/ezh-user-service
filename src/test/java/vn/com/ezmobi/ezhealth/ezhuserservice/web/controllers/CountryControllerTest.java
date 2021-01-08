@@ -50,11 +50,52 @@ class CountryControllerTest {
     @Test
     void findAll() throws Exception {
         // given
-        String findAllUrl = CountryController.BASE_URL + "/findAll";
+        String findAllUrl = CountryController.BASE_URL;
         given(countryService.findAll()).willReturn(List.of(vietnam, laos));
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
+                .andExpect(jsonPath("$[1].name", is(laos.getName())));
+    }
+
+    @Test
+    void findAll_givenValidNameParam_thenFindByName() throws Exception {
+        // given
+        String findByNameUrl = CountryController.BASE_URL + "?name=viet";
+        given(countryService.findByName(anyString())).willReturn(List.of(vietnam));
+
+        //when
+        mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id", is(vietnam.getId())))
+                .andExpect(jsonPath("$[0].name", is(vietnam.getName())));
+    }
+
+    @Test
+    void findAll_givenWrongParam_thenFindAll() throws Exception {
+        // given
+        String findByParamUrl = CountryController.BASE_URL + "?anotherparam=viet";
+        given(countryService.findAll()).willReturn(List.of(vietnam, laos));
+
+        //when
+        mockMvc.perform(get(findByParamUrl).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
+                .andExpect(jsonPath("$[1].name", is(laos.getName())));
+    }
+
+    @Test
+    void findByName_givenNameParamEmpty__thenFindAll() throws Exception {
+        // given
+        String findByEmptyNameUrl = CountryController.BASE_URL + "?name=";
+        given(countryService.findAll()).willReturn(List.of(vietnam, laos));
+
+        //when
+        mockMvc.perform(get(findByEmptyNameUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(2)))
                 .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
@@ -95,26 +136,4 @@ class CountryControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void findByName() throws Exception {
-        // given
-        String findByNameUrl = CountryController.BASE_URL + "/findByName/viet";
-        given(countryService.findByName(anyString())).willReturn(List.of(vietnam));
-
-        //when
-        mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(vietnam.getId())))
-                .andExpect(jsonPath("$[0].name", is(vietnam.getName())));
-    }
-
-    @Test
-    void findByName_withEmptyName() throws Exception {
-        // given
-        String findByNameUrl = CountryController.BASE_URL + "/findByName/";
-
-        //when
-        mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
 }
