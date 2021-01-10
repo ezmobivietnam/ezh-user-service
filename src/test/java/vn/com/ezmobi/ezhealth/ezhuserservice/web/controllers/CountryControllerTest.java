@@ -63,6 +63,18 @@ class CountryControllerTest {
     }
 
     @Test
+    void findAll_givenEmptyResult_thenReceiveOKStatusWithNoData() throws Exception {
+        // given
+        String findAllUrl = CountryController.BASE_URL;
+        given(countryService.findAll()).willReturn(CollectionModel.empty());
+
+        //when
+        mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$['_embedded']").doesNotExist());
+    }
+
+    @Test
     void findAll_givenValidNameParam_thenFindByName() throws Exception {
         // given
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
