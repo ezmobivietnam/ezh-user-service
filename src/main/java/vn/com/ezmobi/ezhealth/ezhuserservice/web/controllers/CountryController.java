@@ -26,6 +26,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 public class CountryController {
     public static final String BASE_URL = "/api/v1/countries";
+    public static final int DEFAULT_PAGE_NUMBER = 0;
+    public static final int DEFAULT_PAGE_SIZE = 20;
 
     private final CountryService countryService;
 
@@ -41,22 +43,23 @@ public class CountryController {
 
         log.debug(String.format("Finding country with conditions: pageNumber=%d, pageSize=%d, name=%s", pageNumber,
                 pageSize, name));
-
-        // isRequestPaging is TRUE means pageNumber not null OR pageSize not null OR both not null
+        final String searchingName = (Objects.nonNull(name) && !name.isBlank()) ? name : null;
         boolean isRequestPaging = Objects.nonNull(pageNumber) || Objects.nonNull(pageSize);
         if (isRequestPaging) {
+            // Support pagination if at least one of two params pageNumber or pageSize is not null.
             log.debug("Start finding country with pagination");
-            // Be aware that the below method call will throw RuntimeException of the ALL params are invalid
-            PageRequest page = PageRequest.of(pageNumber, pageSize);
-            CollectionModel<CountryDto> countryDtoPageList = countryService.findAndPaginated(name, page);
+            int actualPageNumber = Objects.isNull(pageNumber) ? DEFAULT_PAGE_NUMBER : pageNumber;
+            int actualPageSize = Objects.isNull(pageSize) ? DEFAULT_PAGE_SIZE : pageSize;
+            PageRequest page = PageRequest.of(actualPageNumber, actualPageSize);
+            CollectionModel<CountryDto> countryDtoPageList = countryService.findAndPaginated(searchingName, page);
             return ResponseEntity.ok().body(countryDtoPageList);
         } else {
             //
             // RETURN ALL DATA WITHOUT PAGINATION
             //
             CollectionModel<CountryDto> countryDtoList;
-            if (Objects.nonNull(name) && !name.isBlank()) {
-                log.debug("Start finding country (" + name + ")");
+            if (Objects.nonNull(searchingName)) {
+                log.debug("Start finding country (" + searchingName + ")");
                 //Search by name
                 countryDtoList = countryService.findByName(name);
             } else {
