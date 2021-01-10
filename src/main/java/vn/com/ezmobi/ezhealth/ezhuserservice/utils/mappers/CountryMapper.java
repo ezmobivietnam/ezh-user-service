@@ -1,4 +1,4 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.mappers;
+package vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers;
 
 import org.mapstruct.Mapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;

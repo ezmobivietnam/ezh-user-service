@@ -1,8 +1,9 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.hateoas.CollectionModel;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -10,13 +11,17 @@ import java.util.Optional;
  */
 public interface CountryService {
 
-    List<CountryDto> findAll();
+    CollectionModel<CountryDto> findAndPaginated(String nameExp, PageRequest pageRequest);
+
+    CollectionModel<CountryDto> findAll();
 
     Optional<CountryDto> findById(int id);
 
-    List<CountryDto> findByName(String exp);
+    CollectionModel<CountryDto> findByName(String exp);
 
-    CountryDto addOrUpdate(CountryDto country);
+    CountryDto add(CountryDto country);
+
+    CountryDto update(int countryId, CountryDto country);
 
     void delete(int id);
 }

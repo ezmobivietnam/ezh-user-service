@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
@@ -51,55 +52,55 @@ class CountryControllerTest {
     void findAll() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
-        given(countryService.findAll()).willReturn(List.of(vietnam, laos));
+        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
-                .andExpect(jsonPath("$[1].name", is(laos.getName())));
+                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(2)))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][1]['name']", is(laos.getName())));
     }
 
     @Test
     void findAll_givenValidNameParam_thenFindByName() throws Exception {
         // given
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
-        given(countryService.findByName(anyString())).willReturn(List.of(vietnam));
+        given(countryService.findByName(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
 
         //when
         mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id", is(vietnam.getId())))
-                .andExpect(jsonPath("$[0].name", is(vietnam.getName())));
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['id']", is(vietnam.getId())))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())));
     }
 
     @Test
     void findAll_givenWrongParam_thenFindAll() throws Exception {
         // given
         String findByParamUrl = CountryController.BASE_URL + "?anotherparam=viet";
-        given(countryService.findAll()).willReturn(List.of(vietnam, laos));
+        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByParamUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
-                .andExpect(jsonPath("$[1].name", is(laos.getName())));
+                .andExpect(jsonPath("$['_embedded']['countryDtoList']", hasSize(2)))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][1]['name']", is(laos.getName())));
     }
 
     @Test
-    void findByName_givenNameParamEmpty__thenFindAll() throws Exception {
+    void findByName_givenNameParamEmpty_thenFindAll() throws Exception {
         // given
         String findByEmptyNameUrl = CountryController.BASE_URL + "?name=";
-        given(countryService.findAll()).willReturn(List.of(vietnam, laos));
+        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByEmptyNameUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].name", is(vietnam.getName())))
-                .andExpect(jsonPath("$[1].name", is(laos.getName())));
+                .andExpect(jsonPath("$['_embedded']['countryDtoList']", hasSize(2)))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][1]['name']", is(laos.getName())));
     }
 
     @Test

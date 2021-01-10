@@ -2,11 +2,10 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.bootstrap;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Component;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
-
-import java.util.List;
 
 /**
  * Created by ezmobivietnam on 2021-01-05.
@@ -24,7 +23,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         log.info("Loading data...");
-        List<CountryDto> data = countryService.findAll();
-        log.info("Number of country is " + data.size());
+        CollectionModel<CountryDto> data = countryService.findAll();
+        log.info("Number of country is " + data.getContent().size());
     }
 }
