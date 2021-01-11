@@ -12,6 +12,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CountryAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CountryMapper;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.transaction.Transactional;
@@ -106,17 +107,23 @@ public class CountryServiceImpl implements CountryService {
     @Transactional
     public CountryDto add(CountryDto countryDto) {
         Country country = countryRepository.save(countryMapper.countryDtoToCountry(countryDto));
-        return countryMapper.countryToCountryDto(country);
-    }
-
-    @Override
-    public CountryDto update(int countryId, CountryDto country) {
-        return null;
+        return countryAssembler.toModel(country);
     }
 
     @Override
     @Transactional
-    public void delete(int id) {
+    public CountryDto update(CountryDto countryDto, final int countryId) {
+        Optional<Country> storedCountry = countryRepository.findById(countryId);
+        storedCountry.orElseThrow(() -> new DataNotFoundException(String.format("Updating country [%d] failed",
+                countryId)));
+        countryDto.setId(countryId);
+        Country countryEntity = countryRepository.save(countryMapper.countryDtoToCountry(countryDto));
+        return countryAssembler.toModel(countryEntity);
+    }
+
+    @Override
+    @Transactional
+    public void delete(final int id) {
         countryRepository.deleteById(id);
     }
 }

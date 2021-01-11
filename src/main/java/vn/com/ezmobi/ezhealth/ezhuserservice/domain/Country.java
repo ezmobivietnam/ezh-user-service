@@ -1,6 +1,7 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
 import lombok.Data;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -22,6 +23,7 @@ public class Country implements Serializable {
     private String name;
 
     @Column(name = "last_update", nullable = false)
+    @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
 }

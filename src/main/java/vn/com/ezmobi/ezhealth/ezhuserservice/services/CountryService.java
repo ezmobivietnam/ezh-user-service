@@ -21,7 +21,7 @@ public interface CountryService {
 
     CountryDto add(CountryDto country);
 
-    CountryDto update(int countryId, CountryDto country);
+    CountryDto update(CountryDto country, int countryId);
 
     void delete(int id);
 }

@@ -10,6 +10,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,4 +82,25 @@ public class CountryController {
         return ResponseEntity.ok().body(countryDto.orElseThrow(DataNotFoundException::new));
     }
 
+    @PostMapping()
+    public ResponseEntity<CountryDto> add(@Valid @RequestBody CountryDto country) {
+        log.debug("Starting adding new country:", country);
+        CountryDto newCountryDto = countryService.add(country);
+        return ResponseEntity.created(
+                linkTo(methodOn(CountryController.class).findById(newCountryDto.getId())).toUri())
+                .body(newCountryDto);
+    }
+
+    @PutMapping("/{countryId}")
+    public ResponseEntity<CountryDto> update(@RequestBody CountryDto country, @PathVariable int countryId) {
+        log.debug(String.format("Start updating country with id: %d with new data: %s", countryId, country));
+        return ResponseEntity.ok().body(countryService.update(country, countryId));
+    }
+
+    @DeleteMapping("/{countryId}")
+    public ResponseEntity<Void> delete(@PathVariable int countryId) {
+        log.debug(String.format("Start deleting country with id [%d]", countryId));
+        countryService.delete(countryId);
+        return ResponseEntity.noContent().build();
+    }
 }

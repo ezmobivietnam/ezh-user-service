@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
@@ -17,18 +18,17 @@ import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Created by ezmobivietnam on 2021-01-06.
  */
 @WebMvcTest(CountryController.class)
-class CountryControllerTest {
+class CountryControllerTest extends BaseControllerTest {
 
     @Autowired
     MockMvc mockMvc;
@@ -149,4 +149,79 @@ class CountryControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
+    @Test
+    void add() throws Exception {
+        //given
+        String postURL = CountryController.BASE_URL;
+        given(countryService.add(any())).willReturn(vietnam);
+        //then
+        mockMvc.perform(
+                post(postURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(vietnam)))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+//                .andExpect(header().string(HttpHeaders.LOCATION, CountryController.BASE_URL + "/1"))
+        ;
+    }
+
+    @Test
+    void add_withEmptyName() throws Exception {
+        //given
+        String postURL = CountryController.BASE_URL;
+        //then
+        mockMvc.perform(
+                post(postURL).contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(CountryDto.builder().build())))
+                .andExpect(status().isBadRequest())
+        ;
+    }
+
+    @Test
+    void update() throws Exception {
+        /**
+         * Sample format of actual response data
+         * {
+         *     "id": 1,
+         *     "name": "Afghanistan_UPDATED",
+         *     "_links": {
+         *         "self": {
+         *             "href": "http://localhost:8080/api/v1/countries/1"
+         *         }
+         *     }
+         * }
+         */
+        //given
+        String putURL = CountryController.BASE_URL + "/" + vietnam.getId();
+        CountryDto updatedCountry =
+                vietnam.builder().id(vietnam.getId()).name(vietnam.getName() + "_Updated").build();
+        given(countryService.update(vietnam, vietnam.getId()))
+                .willReturn(updatedCountry);
+        // then
+        mockMvc.perform(
+                put(putURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(vietnam)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$['id']", is(updatedCountry.getId())))
+                .andExpect(jsonPath("$['name']", is(updatedCountry.getName())))
+        ;
+    }
+
+    @Test
+    void delete() throws Exception {
+        //given
+        String deleteURL = CountryController.BASE_URL + "/1";
+        willDoNothing().given(countryService).delete(anyInt());
+        //then
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete(deleteURL).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void delete_withInvalidId() throws Exception {
+        //given
+        String deleteURL = CountryController.BASE_URL + "/AAA";
+        //then
+        mockMvc.perform(MockMvcRequestBuilders
+                .delete(deleteURL).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
 }
