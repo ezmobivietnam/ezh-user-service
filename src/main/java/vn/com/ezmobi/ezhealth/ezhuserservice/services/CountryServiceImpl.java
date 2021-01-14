@@ -12,6 +12,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CountryAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CountryMapper;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CountryController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * Created by ezmobivietnam on 2021-01-04.
@@ -54,8 +58,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public CollectionModel<CountryDto> findAndPaginated(String nameExp, PageRequest pageRequest) {
-        Assert.notNull(pageRequest, "Name expression must not be null!");
+    public CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest) {
         Assert.notNull(pageRequest, "PageRequest must not be null!");
         //
         Page<Country> countryEntityList;
@@ -84,6 +87,8 @@ public class CountryServiceImpl implements CountryService {
                 .collect(Collectors.toList());
         // wrap the result by CollectionModel
         CollectionModel<CountryDto> collectionModel = CollectionModel.of(countryDtoModelList);
+        collectionModel.add(linkTo(methodOn(CountryController.class)
+                .findAll(null, null, null)).withSelfRel().expand());
         //
         log.info("End loading country data. Will return data to caller right now.");
         return collectionModel;
@@ -96,11 +101,14 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public CollectionModel<CountryDto> findByName(String exp) {
-        List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(exp);
-        return CollectionModel.of(countryList.stream()
+    public CollectionModel<CountryDto> findByName(String nameExp) {
+        List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
+        CollectionModel<CountryDto> countryDtoModelList = CollectionModel.of(countryList.stream()
                 .map(countryAssembler::toModel)
                 .collect(Collectors.toList()));
+        countryDtoModelList.add(linkTo(methodOn(CountryController.class)
+                    .findAll(null, null, nameExp)).withSelfRel().expand());
+        return countryDtoModelList;
     }
 
     @Override

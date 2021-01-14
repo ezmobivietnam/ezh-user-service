@@ -38,21 +38,21 @@ public class CountryController {
 
     @GetMapping()
     public ResponseEntity<CollectionModel<CountryDto>> findAll(
-            @RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size,
             @RequestParam(name = "name", required = false) String name) {
 
-        log.debug(String.format("Finding country with conditions: pageNumber=%d, pageSize=%d, name=%s", pageNumber,
-                pageSize, name));
+        log.debug(String.format("Finding country with conditions: pageNumber=%d, pageSize=%d, name=%s", page,
+                size, name));
         final String searchingName = (Objects.nonNull(name) && !name.isBlank()) ? name : null;
-        boolean isRequestPaging = Objects.nonNull(pageNumber) || Objects.nonNull(pageSize);
+        boolean isRequestPaging = Objects.nonNull(page) || Objects.nonNull(size);
         if (isRequestPaging) {
             // Support pagination if at least one of two params pageNumber or pageSize is not null.
             log.debug("Start finding country with pagination");
-            int actualPageNumber = Objects.isNull(pageNumber) ? DEFAULT_PAGE_NUMBER : pageNumber;
-            int actualPageSize = Objects.isNull(pageSize) ? DEFAULT_PAGE_SIZE : pageSize;
-            PageRequest page = PageRequest.of(actualPageNumber, actualPageSize);
-            CollectionModel<CountryDto> countryDtoPageList = countryService.findAndPaginated(searchingName, page);
+            int actualPageNumber = Objects.isNull(page) ? DEFAULT_PAGE_NUMBER : page;
+            int actualPageSize = Objects.isNull(size) ? DEFAULT_PAGE_SIZE : size;
+            PageRequest requestPage = PageRequest.of(actualPageNumber, actualPageSize);
+            CollectionModel<CountryDto> countryDtoPageList = countryService.findPaginated(searchingName, requestPage);
             return ResponseEntity.ok().body(countryDtoPageList);
         } else {
             //
@@ -68,9 +68,7 @@ public class CountryController {
                 // Find all records and return all
                 countryDtoList = countryService.findAll();
             }
-            // Add self reference to the model list
-            countryDtoList.add(linkTo(methodOn(CountryController.class)
-                    .findAll(pageNumber, pageSize, name)).withSelfRel().expand());
+            //
             return ResponseEntity.ok().body(countryDtoList);
         }
     }

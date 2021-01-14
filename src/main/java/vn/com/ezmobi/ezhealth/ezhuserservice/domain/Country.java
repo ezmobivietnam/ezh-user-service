@@ -1,6 +1,8 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -9,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
+@NoArgsConstructor
 @Table(name = "country")
 public class Country implements Serializable {
 
@@ -26,4 +29,9 @@ public class Country implements Serializable {
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
+    @Builder
+    public Country(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 }

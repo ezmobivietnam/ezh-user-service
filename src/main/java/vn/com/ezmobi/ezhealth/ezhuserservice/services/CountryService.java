@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public interface CountryService {
 
-    CollectionModel<CountryDto> findAndPaginated(String nameExp, PageRequest pageRequest);
+    CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest);
 
     CollectionModel<CountryDto> findAll();
 
