@@ -3,6 +3,8 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -25,11 +27,15 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 /**
- * Ref: https://www.baeldung.com/junit-assertions
+ * Ref:
+ * https://www.baeldung.com/junit-assertions
+ * https://www.baeldung.com/spring-boot-exclude-auto-configuration-test
+ * https://javarevisited.blogspot.com/2019/04/spring-boot-error-error-creating-bean.html#axzz6jZMAb89u
  * <p>
  * Created by ezmobivietnam on 2021-01-12.
  */
 @SpringBootTest
+@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 class CountryServiceTest {
 
     @MockBean

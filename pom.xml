@@ -12,7 +12,7 @@
     <artifactId>ezh-user-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ezh-user-service</name>
-    <description>RESTfull services for managing user information</description>
+    <description>RESTful services for managing user information</description>
 
     <properties>
         <java.version>11</java.version>
