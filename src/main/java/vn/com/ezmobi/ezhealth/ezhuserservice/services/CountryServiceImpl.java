@@ -20,7 +20,6 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -82,11 +81,7 @@ public class CountryServiceImpl implements CountryService {
         log.info("Start loading country data");
         //
         List<Country> countryList = countryRepository.findAll();
-        List<CountryDto> countryDtoModelList = countryList.stream()
-                .map(countryAssembler::toModel)
-                .collect(Collectors.toList());
-        // wrap the result by CollectionModel
-        CollectionModel<CountryDto> collectionModel = CollectionModel.of(countryDtoModelList);
+        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countryList);
         collectionModel.add(linkTo(methodOn(CountryController.class)
                 .findAll(null, null, null)).withSelfRel().expand());
         //
@@ -103,11 +98,9 @@ public class CountryServiceImpl implements CountryService {
     @Override
     public CollectionModel<CountryDto> findByName(String nameExp) {
         List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
-        CollectionModel<CountryDto> countryDtoModelList = CollectionModel.of(countryList.stream()
-                .map(countryAssembler::toModel)
-                .collect(Collectors.toList()));
+        CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
         countryDtoModelList.add(linkTo(methodOn(CountryController.class)
-                    .findAll(null, null, nameExp)).withSelfRel().expand());
+                .findAll(null, null, nameExp)).withSelfRel().expand());
         return countryDtoModelList;
     }
 
