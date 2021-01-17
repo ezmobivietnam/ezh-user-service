@@ -26,7 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping(CountryController.BASE_URL)
 @RestController
 public class CountryController {
-    public static final String BASE_URL = "/api/v1/countries";
+    public static final String BASE_URL = "/api/countries";
     public static final int DEFAULT_PAGE_NUMBER = 0;
     public static final int DEFAULT_PAGE_SIZE = 20;
 

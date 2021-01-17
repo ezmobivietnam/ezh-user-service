@@ -33,6 +33,14 @@ public class MvcExceptionHandler {
 //    }
 //
 
+    /**
+     * Method parameters that are decorated with the @PathVariable annotation can be of any simple type such as int,
+     * long, Date... Spring automatically converts to the appropriate type and throws a TypeMismatchException if the
+     * type is not correct.
+     *
+     * @param exc
+     * @return
+     */
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<List<String>> methodArgumentTypeMismatchError(MethodArgumentTypeMismatchException exc) {
         log.error("Method argument type mismatch error", exc);

@@ -3,8 +3,6 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -35,7 +33,7 @@ import static org.mockito.Mockito.verify;
  * Created by ezmobivietnam on 2021-01-12.
  */
 @SpringBootTest
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 class CountryServiceTest {
 
     @MockBean
@@ -57,7 +55,7 @@ class CountryServiceTest {
     /**
      * Find paginated with ALL three params not null. The research return only ONE item so "_links" element only
      * contain the link "self"
-     * Ex.: http://localhost:8080/api/v1/countries/?page=0&size=2&name=Viet
+     * Ex.: http://localhost:8080/api/countries/?page=0&size=2&name=Viet
      */
     @Test
     void findPaginated() {
@@ -71,7 +69,7 @@ class CountryServiceTest {
          *                 "name": "Vietnam",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/105"
+         *                         "href": "http://localhost:8080/api/countries/105"
          *                     }
          *                 }
          *             }
@@ -79,7 +77,7 @@ class CountryServiceTest {
          *     },
          *     "_links": {
          *         "self": {
-         *             "href": "http://localhost:8080/api/v1/countries/?name=Viet&page=0&size=2"
+         *             "href": "http://localhost:8080/api/countries/?name=Viet&page=0&size=2"
          *         }
          *     },
          *     "page": {
@@ -110,7 +108,7 @@ class CountryServiceTest {
      * 3. "next": the link to the next page
      * 4. "last": the link to the last page
      * <p>
-     * E.x: http://localhost:8080/api/v1/countries/?page=0&size=2"
+     * E.x: http://localhost:8080/api/countries/?page=0&size=2"
      */
     @Test
     void findPaginated_findAll() {
@@ -124,7 +122,7 @@ class CountryServiceTest {
          *                 "name": "Afghanistan",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/1"
+         *                         "href": "http://localhost:8080/api/countries/1"
          *                     }
          *                 }
          *             },
@@ -133,7 +131,7 @@ class CountryServiceTest {
          *                 "name": "Algeria",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/2"
+         *                         "href": "http://localhost:8080/api/countries/2"
          *                     }
          *                 }
          *             }
@@ -141,16 +139,16 @@ class CountryServiceTest {
          *     },
          *     "_links": {
          *         "first": {
-         *             "href": "http://localhost:8080/api/v1/countries/?page=0&size=2"
+         *             "href": "http://localhost:8080/api/countries/?page=0&size=2"
          *         },
          *         "self": {
-         *             "href": "http://localhost:8080/api/v1/countries/?page=0&size=2"
+         *             "href": "http://localhost:8080/api/countries/?page=0&size=2"
          *         },
          *         "next": {
-         *             "href": "http://localhost:8080/api/v1/countries/?page=1&size=2"
+         *             "href": "http://localhost:8080/api/countries/?page=1&size=2"
          *         },
          *         "last": {
-         *             "href": "http://localhost:8080/api/v1/countries/?page=54&size=2"
+         *             "href": "http://localhost:8080/api/countries/?page=54&size=2"
          *         }
          *     },
          *     "page": {
@@ -184,7 +182,7 @@ class CountryServiceTest {
          *                 "name": "Afghanistan",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/1"
+         *                         "href": "http://localhost:8080/api/countries/1"
          *                     }
          *                 }
          *             },
@@ -193,7 +191,7 @@ class CountryServiceTest {
          *                 "name": "Vietnam",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/105"
+         *                         "href": "http://localhost:8080/api/countries/105"
          *                     }
          *                 }
          *             },
@@ -202,7 +200,7 @@ class CountryServiceTest {
          *     },
          *     "_links": {
          *         "self": {
-         *             "href": "http://localhost:8080/api/v1/countries"
+         *             "href": "http://localhost:8080/api/countries"
          *         }
          *     }
          * }
@@ -229,6 +227,16 @@ class CountryServiceTest {
     }
 
     @Test
+    void findById_notFound() {
+        //given
+        given(countryRepository.findById(vietnam.getId())).willReturn(Optional.empty());
+        //when
+        Optional<CountryDto> result = countryService.findById(vietnam.getId());
+        //then
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     void findByName() {
         /**
          * Sample json format responded by findByName():
@@ -240,7 +248,7 @@ class CountryServiceTest {
          *                 "name": "Vietnam",
          *                 "_links": {
          *                     "self": {
-         *                         "href": "http://localhost:8080/api/v1/countries/105"
+         *                         "href": "http://localhost:8080/api/countries/105"
          *                     }
          *                 }
          *             }
@@ -248,7 +256,7 @@ class CountryServiceTest {
          *     },
          *     "_links": {
          *         "self": {
-         *             "href": "http://localhost:8080/api/v1/countries?name=Viet"
+         *             "href": "http://localhost:8080/api/countries?name=Viet"
          *         }
          *     }
          * }

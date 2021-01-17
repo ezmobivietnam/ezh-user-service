@@ -1,45 +1,42 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @NoArgsConstructor
 @Data
-@ToString
-@EqualsAndHashCode
 @Entity
-@Table(name = "country")
-public class Country implements Serializable {
+@Table(name = "city")
+public class City implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "country_id", nullable = false)
+    @Column(name = "city_id", nullable = false)
     @EqualsAndHashCode.Include
     private int id;
 
-    @Column(name = "country", nullable = false)
+    @Column(name = "city", nullable = false)
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id", nullable = false)
+    private Country country;
 
     @Column(name = "last_update", nullable = false)
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
-    @OneToMany(mappedBy = "country")
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Set<City> cities;
-
-    @Builder
-    public Country(int id, String name, Set<City> cities) {
+    public City(int id, String name, Country country) {
         this.id = id;
         this.name = name;
-        this.cities = cities;
+        this.country = country;
     }
 }
