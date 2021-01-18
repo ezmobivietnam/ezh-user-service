@@ -34,9 +34,9 @@ public class CityController {
     @GetMapping()
     public ResponseEntity<CollectionModel<CityDto>> findList(
             @PathVariable Integer countryId,
+            @RequestParam(name = "name", required = false) String name,
             @RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "size", required = false) Integer size,
-            @RequestParam(name = "name", required = false) String name) {
+            @RequestParam(value = "size", required = false) Integer size) {
 
         log.debug(String.format("Finding cities with conditions: countryId=%d, pageNumber=%d, pageSize=%d, name=%s",
                 countryId, page, size, name));
@@ -70,12 +70,12 @@ public class CityController {
     }
 
     @PostMapping()
-    public ResponseEntity<CityDto> addNew(@PathVariable @Min(1) Integer countryId, @RequestBody @Valid CityDto model) {
+    public ResponseEntity<Void> addNew(@PathVariable @Min(1) Integer countryId, @RequestBody @Valid CityDto model) {
         return null;
     }
 
     @PutMapping("/{cityId}")
-    public ResponseEntity<CityDto> update(@PathVariable @Min(1) Integer countryId,
+    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer countryId,
                                           @RequestBody @Valid CityDto model,
                                           @PathVariable @Min(1) int cityId) {
         return null;

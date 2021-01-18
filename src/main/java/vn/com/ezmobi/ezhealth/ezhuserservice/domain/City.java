@@ -1,5 +1,6 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,7 @@ public class City implements Serializable {
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
+    @Builder
     public City(int id, String name, Country country) {
         this.id = id;
         this.name = name;
