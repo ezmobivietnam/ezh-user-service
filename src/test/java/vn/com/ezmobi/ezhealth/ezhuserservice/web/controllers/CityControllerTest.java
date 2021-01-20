@@ -24,6 +24,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CityMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -64,64 +65,64 @@ class CityControllerTest {
         skikdaCityEntity = City.builder().id(483).name("Skikda").country(algeriaCountryEntity).build();
     }
 
-    @Test
     /**
      * Test findList with all parameters are set.
-     *
+     * <p>
      * Test URL: http://localhost:8080/api/countries/2/cities/?page=0&size=2&name=a
-     *
+     * <p>
      * Response data:
      * {
-     *     "_embedded": {
-     *         "cityDtoList": [
-     *             {
-     *                 "id": 59,
-     *                 "name": "Batna",
-     *                 "_links": {
-     *                     "self": {
-     *                         "href": "http://localhost:8080/api/countries/2/cities/59"
-     *                     },
-     *                     "country": {
-     *                         "href": "http://localhost:8080/api/countries/2"
-     *                     }
-     *                 }
-     *             },
-     *             {
-     *                 "id": 63,
-     *                 "name": "Bchar",
-     *                 "_links": {
-     *                     "self": {
-     *                         "href": "http://localhost:8080/api/countries/2/cities/63"
-     *                     },
-     *                     "country": {
-     *                         "href": "http://localhost:8080/api/countries/2"
-     *                     }
-     *                 }
-     *             }
-     *         ]
-     *     },
-     *     "_links": {
-     *         "first": {
-     *             "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2"
-     *         },
-     *         "self": {
-     *             "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2"
-     *         },
-     *         "next": {
-     *             "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2"
-     *         },
-     *         "last": {
-     *             "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2"
-     *         }
-     *     },
-     *     "page": {
-     *         "size": 2,
-     *         "totalElements": 3,
-     *         "totalPages": 2,
-     *         "number": 0
-     *     }
+     * "_embedded": {
+     * "cityDtoList": [
+     * {
+     * "id": 59,
+     * "name": "Batna",
+     * "_links": {
+     * "self": {
+     * "href": "http://localhost:8080/api/countries/2/cities/59"
+     * },
+     * "country": {
+     * "href": "http://localhost:8080/api/countries/2"
+     * }
+     * }
+     * },
+     * {
+     * "id": 63,
+     * "name": "Bchar",
+     * "_links": {
+     * "self": {
+     * "href": "http://localhost:8080/api/countries/2/cities/63"
+     * },
+     * "country": {
+     * "href": "http://localhost:8080/api/countries/2"
+     * }
+     * }
+     * }
+     * ]
+     * },
+     * "_links": {
+     * "first": {
+     * "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2"
+     * },
+     * "self": {
+     * "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2"
+     * },
+     * "next": {
+     * "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2"
+     * },
+     * "last": {
+     * "href": "http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2"
+     * }
+     * },
+     * "page": {
+     * "size": 2,
+     * "totalElements": 3,
+     * "totalPages": 2,
+     * "number": 0
+     * }
      * }
      */
+    @Test
     void findList() throws Exception {
         // given
         int countryId = 2;
@@ -135,7 +136,7 @@ class CityControllerTest {
         HateoasPageableHandlerMethodArgumentResolver resolver = new HateoasPageableHandlerMethodArgumentResolver();
         UriComponents baseUri =
                 UriComponentsBuilder.fromUriString(
-                        String.format("http://localhost:8080/api/countries/%d/cities/?name=%s", countryId,
+                        String.format("http://localhost:8080/api/countries/%d/cities?name=%s", countryId,
                                 searchingName))
                         .build();
         PagedResourcesAssembler pagedResourcesAssembler = new PagedResourcesAssembler(resolver, baseUri);
@@ -144,20 +145,20 @@ class CityControllerTest {
         given(service.findPaginated(anyInt(), anyString(), any(PageRequest.class)))
                 .willReturn(cityDtoCollectionModel);
         //when
-        String requestURI = String.format("/api/countries/%d/cities/?name=%s&page=%d&size=%d", countryId,
+        String requestURI = String.format("/api/countries/%d/cities?name=%s&page=%d&size=%d", countryId,
                 searchingName, page, size);
         mockMvc.perform(MockMvcRequestBuilders.get(requestURI)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.cityDtoList", hasSize(2)))
                 .andExpect(jsonPath("$._links.first.href",
-                        is("http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2")))
+                        is("http://localhost:8080/api/countries/2/cities?name=a&page=0&size=2")))
                 .andExpect(jsonPath("$._links.self.href",
-                        is("http://localhost:8080/api/countries/2/cities/?name=a&page=0&size=2")))
+                        is("http://localhost:8080/api/countries/2/cities?name=a&page=0&size=2")))
                 .andExpect(jsonPath("$._links.next.href",
-                        is("http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2")))
+                        is("http://localhost:8080/api/countries/2/cities?name=a&page=1&size=2")))
                 .andExpect(jsonPath("$._links.last.href",
-                        is("http://localhost:8080/api/countries/2/cities/?name=a&page=1&size=2")))
+                        is("http://localhost:8080/api/countries/2/cities?name=a&page=1&size=2")))
                 .andExpect(jsonPath("$.page.size", is(pageRequest.getPageSize())))
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
                 .andExpect(jsonPath("$.page.totalPages", is(2)))
@@ -165,7 +166,15 @@ class CityControllerTest {
     }
 
     @Test
-    void findById() {
+    void findById() throws Exception {
+        //given
+        int countryId = 2;
+        int cityId = 59;
+        String url = String.format("http://localhost:8080/api/countries/%d/cities/%d", countryId, cityId);
+        given(service.findById(anyInt(), anyInt())).willReturn(Optional.of(cityAssembler.toModel(batnaCityEntity)));
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test

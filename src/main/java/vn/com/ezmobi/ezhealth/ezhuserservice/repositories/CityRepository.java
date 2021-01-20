@@ -14,12 +14,19 @@ public interface CityRepository extends JpaRepository<City, Integer>, JpaSpecifi
     Page<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String cityName,
                                                                      Integer countryId,
                                                                      Pageable pageRequest);
+
+    List<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String name, Integer countryId);
+
+    Page<City> findAllByNameContainingIgnoreCase(String name, Pageable pageRequest);
+
+    List<City> findAllByNameContainingIgnoreCase(String name);
+
     Page<City> findAllByCountry_Id(Integer countryId, Pageable pageRequest);
 
     List<City> findAllByCountry_Id(Integer countryId);
 
-    List<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String name, Integer countryId);
-
     Optional<City> findByIdAndCountry_Id(Integer cityId, Integer countryId);
+
+    void  deleteByIdAndCountry_Id(Integer cityId, Integer countryId);
 
 }

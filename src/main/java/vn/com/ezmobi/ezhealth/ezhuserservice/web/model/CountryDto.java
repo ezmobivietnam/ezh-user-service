@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 import java.util.Set;
 
 /**
+ * Ref: https://www.baeldung.com/jackson-ignore-properties-on-serialization
+ *
  * Created by ezmobivietnam on 2021-01-04.
  */
 @Data

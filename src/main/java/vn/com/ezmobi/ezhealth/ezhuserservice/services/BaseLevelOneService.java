@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Created by ezmobivietnam on 2021-01-16.
  */
-public interface BaseLevelOneService<T extends RepresentationModel<? extends T>> {
+public interface BaseLevelOneService<T extends RepresentationModel<? extends T>> extends SimpleService {
 
     /**
      * Finding data with pagination belong to the root object by rootId.
@@ -42,7 +42,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * Finding items belong to a root object by name.
      *
      * @param rootId (Required) the root ID
-     * @param name   (Required) the id of the item to be found
+     * @param name   (Required) the name of the item to be found
      * @return
      */
     CollectionModel<T> findByName(Integer rootId, String name);

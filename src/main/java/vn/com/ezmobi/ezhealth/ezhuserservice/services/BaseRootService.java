@@ -9,19 +9,13 @@ import java.util.Optional;
 /**
  * Created by ezmobivietnam on 2021-01-15.
  */
-public interface BaseRootService<T extends RepresentationModel<? extends T>> {
+public interface BaseRootService<T extends RepresentationModel<? extends T>> extends SimpleService {
 
-    CollectionModel<T> findPaginated(String nameExp, PageRequest pageRequest);
-
-    CollectionModel<T> findAll();
-
-    Optional<T> findById(int id);
-
-    CollectionModel<T> findByName(String exp);
+    Optional<T> findById(Integer id);
 
     T addNew(T representationModel);
 
     T update(T representationModel, int countryId);
 
-    void delete(int id);
+    void delete(Integer id);
 }

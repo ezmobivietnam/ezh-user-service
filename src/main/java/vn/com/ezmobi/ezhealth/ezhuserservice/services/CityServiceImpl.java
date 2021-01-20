@@ -11,11 +11,17 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.domain.City;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CityRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CityAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CityMapper;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CityController;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CitySimpleController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * Created by ezmobivietnam on 2021-01-15.
@@ -50,7 +56,7 @@ public class CityServiceImpl implements CityService {
      */
     @Override
     public CollectionModel<CityDto> findPaginated(Integer countryId, String name, PageRequest pageRequest) {
-        Assert.notNull(countryId, "Country Id must not be null!");
+        Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(pageRequest, "PageRequest must not be null!");
         //
         log.debug(String.format("Country id=%d, country name=%s, pageRequest=%s", countryId, name, pageRequest));
@@ -76,7 +82,11 @@ public class CityServiceImpl implements CityService {
     public CollectionModel<CityDto> findAll(Integer countryId) {
         Assert.notNull(countryId, "Country id must not be null!");
         List<City> cityEntityList = repository.findAllByCountry_Id(countryId);
-        return assembler.toCollectionModel(cityEntityList);
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CityController.class)
+                        .findList(countryId, null, null, null)).withSelfRel().expand());
+        return collectionModel;
     }
 
     /**
@@ -97,16 +107,21 @@ public class CityServiceImpl implements CityService {
     /**
      * Finding cities belong to a country by name.
      *
-     * @param countryId (Required) the country id
+     * @param countryId (Optional) the country id
      * @param name      (Required) the name of the city to be found
      * @return
      */
     @Override
     public CollectionModel<CityDto> findByName(Integer countryId, String name) {
-        Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(name, "City name must not be null!");
-        List<City> cityEntityList = repository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId);
-        return assembler.toCollectionModel(cityEntityList);
+        List<City> cityEntityList = (Objects.nonNull(countryId)) ?
+                repository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId) :
+                repository.findAllByNameContainingIgnoreCase(name);
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CityController.class)
+                        .findList(countryId, name, null, null)).withSelfRel().expand());
+        return collectionModel;
     }
 
     /**
@@ -142,12 +157,52 @@ public class CityServiceImpl implements CityService {
     /**
      * Deleting an city from the country.
      *
-     * @param rootId (Required) the root ID
-     * @param cityId (Required) the id of the item to be deleted
+     * @param countryId (Required) the root ID
+     * @param cityId    (Required) the id of the item to be deleted
      */
     @Override
-    public void delete(Integer rootId, Integer cityId) {
-        Assert.notNull(rootId, "Country id must not be null!");
-        Assert.notNull(rootId, "City id must not be null!");
+    @Transactional
+    public void delete(Integer countryId, Integer cityId) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        Assert.notNull(cityId, "City id must not be null!");
+        repository.deleteByIdAndCountry_Id(cityId, countryId);
     }
+
+    @Override
+    public CollectionModel<CityDto> findPaginated(String name, PageRequest pageRequest) {
+        Assert.notNull(pageRequest, "PageRequest must not be null!");
+        //
+        log.debug(String.format("Country name=%s, pageRequest=%s", name, pageRequest));
+        Page<City> cityEntityPage;
+        if (Objects.isNull(name) || name.isBlank()) {
+            // find all cities
+            cityEntityPage = repository.findAll(pageRequest);
+        } else {
+            // finding pagination by name
+            cityEntityPage = repository.findAllByNameContainingIgnoreCase(name, pageRequest);
+        }
+        return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
+    }
+
+    @Override
+    public CollectionModel<CityDto> findAll() {
+        List<City> cityEntityList = repository.findAll();
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CitySimpleController.class)
+                        .findList(null, null, null)).withSelfRel().expand());
+        return collectionModel;
+    }
+
+    @Override
+    public CollectionModel<CityDto> findByColumn(String name) {
+        Assert.notNull(name, "Name must not be null!");
+        List<City> cityEntityList = repository.findAllByNameContainingIgnoreCase(name);
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CitySimpleController.class)
+                        .findList(name, null, null)).withSelfRel().expand());
+        return collectionModel;
+    }
+
 }
