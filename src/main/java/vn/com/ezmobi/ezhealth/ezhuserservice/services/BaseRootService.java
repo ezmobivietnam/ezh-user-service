@@ -1,7 +1,5 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 
 import java.util.Optional;

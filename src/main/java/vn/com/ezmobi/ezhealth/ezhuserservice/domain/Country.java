@@ -42,4 +42,14 @@ public class Country implements Serializable {
         this.name = name;
         this.cities = cities;
     }
+
+    /**
+     * Adding new city to country.
+     *
+     * @param city
+     */
+    public void add(City city) {
+        city.setCountry(this);
+        getCities().add(city);
+    }
 }

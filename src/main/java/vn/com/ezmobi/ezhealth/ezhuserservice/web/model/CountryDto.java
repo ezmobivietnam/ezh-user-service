@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -23,11 +25,15 @@ import java.util.Set;
 @JsonIgnoreProperties(value = { "cities" })
 public class CountryDto extends RepresentationModel<CountryDto> {
 
-    private int id;
+    @Null
+    private Integer id;
 
     @NotBlank
     @Size(min = 1, max = 50)
     private String name;
 
     private Set<CityDto> cities;
+
+    @Null
+    private LocalDateTime lastUpdate;
 }

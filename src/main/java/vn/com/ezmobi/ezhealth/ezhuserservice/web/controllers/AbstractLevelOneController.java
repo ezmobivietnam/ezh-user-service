@@ -3,13 +3,16 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,6 +74,19 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
     public ResponseEntity<Void> delete(@Min(1) Integer ownerId, @Min(1) Integer childId) {
         getService().delete(ownerId, childId);
         return ResponseEntity.noContent().build();
+    }
+
+    public ResponseEntity<Void> addNew(@Min(1) Integer ownerId, @Valid T model) {
+        RepresentationModel newModel = getService().addNew(ownerId, model);
+        return ResponseEntity.created(newModel.getRequiredLink(IanaLinkRelations.SELF_VALUE).toUri()).build();
+    }
+
+    public ResponseEntity<Void> update(@Min(1) Integer ownerId,
+                                       @Valid CityDto model,
+                                       @Min(1) Integer childId) {
+        //
+        getService().update(ownerId, model, childId);
+        return ResponseEntity.ok().build();
     }
 
     protected abstract BaseLevelOneService getService();

@@ -153,10 +153,11 @@ class CountryControllerTest extends BaseControllerTest {
     void add() throws Exception {
         //given
         String postURL = CountryController.BASE_URL;
+        CountryDto newCountry = CountryDto.builder().name("New country").build();
         given(countryService.add(any())).willReturn(vietnam);
         //then
         mockMvc.perform(
-                post(postURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(vietnam)))
+                post(postURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(newCountry)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
 //                .andExpect(header().string(HttpHeaders.LOCATION, CountryController.BASE_URL + "/1"))

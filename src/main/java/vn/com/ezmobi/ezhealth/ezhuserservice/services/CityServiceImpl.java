@@ -8,11 +8,14 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.City;
+import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CityRepository;
+import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CityAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CityMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CityController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CitySimpleController;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.transaction.Transactional;
@@ -24,22 +27,27 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
+ * Ref:
+ * 1. https://www.baeldung.com/spring-data-partial-update
+ *
  * Created by ezmobivietnam on 2021-01-15.
  */
 @Slf4j
 @Service
 public class CityServiceImpl implements CityService {
 
-    private final CityRepository repository;
+    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
     private final CityMapper mapper;
     private final CityAssembler assembler;
     private final PagedResourcesAssembler pagedResourcesAssembler;
 
     public CityServiceImpl(CityRepository repository,
-                           CityMapper mapper,
+                           CountryRepository countryRepository, CityMapper mapper,
                            CityAssembler assembler,
                            PagedResourcesAssembler pagedResourcesAssembler) {
-        this.repository = repository;
+        this.cityRepository = repository;
+        this.countryRepository = countryRepository;
         this.mapper = mapper;
         this.assembler = assembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
@@ -63,10 +71,10 @@ public class CityServiceImpl implements CityService {
         Page<City> cityEntityPage;
         if (Objects.isNull(name) || name.isBlank()) {
             // find all cities belong to a country
-            cityEntityPage = repository.findAllByCountry_Id(countryId, pageRequest);
+            cityEntityPage = cityRepository.findAllByCountry_Id(countryId, pageRequest);
         } else {
             // finding pagination by name
-            cityEntityPage = repository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId,
+            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId,
                     pageRequest);
         }
         return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
@@ -81,7 +89,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public CollectionModel<CityDto> findAll(Integer countryId) {
         Assert.notNull(countryId, "Country id must not be null!");
-        List<City> cityEntityList = repository.findAllByCountry_Id(countryId);
+        List<City> cityEntityList = cityRepository.findAllByCountry_Id(countryId);
         CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
@@ -100,7 +108,7 @@ public class CityServiceImpl implements CityService {
     public Optional<CityDto> findById(Integer countryId, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
-        Optional<City> cityEntity = repository.findByIdAndCountry_Id(cityId, countryId);
+        Optional<City> cityEntity = cityRepository.findByIdAndCountry_Id(cityId, countryId);
         return cityEntity.map(assembler::toModel);
     }
 
@@ -115,8 +123,8 @@ public class CityServiceImpl implements CityService {
     public CollectionModel<CityDto> findByName(Integer countryId, String name) {
         Assert.notNull(name, "City name must not be null!");
         List<City> cityEntityList = (Objects.nonNull(countryId)) ?
-                repository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId) :
-                repository.findAllByNameContainingIgnoreCase(name);
+                cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId) :
+                cityRepository.findAllByNameContainingIgnoreCase(name);
         CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
@@ -132,10 +140,19 @@ public class CityServiceImpl implements CityService {
      * @return
      */
     @Override
+    @Transactional
     public CityDto addNew(Integer countryId, CityDto cityDto) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityDto, "City data must not be null!");
-        return null;
+        Optional<Country> result = countryRepository.findById(countryId);
+        Country country = result.orElseThrow(() -> {
+            String s = String.format("Country [%] does not exist", countryId);
+            return new DataNotFoundException(s);
+        });
+        City city = mapper.cityDtoToCity(cityDto);
+        country.add(city);
+        city = cityRepository.save(city);
+        return assembler.toModel(city);
     }
 
     /**
@@ -147,11 +164,22 @@ public class CityServiceImpl implements CityService {
      * @return
      */
     @Override
+    @Transactional
     public CityDto update(Integer countryId, CityDto cityDto, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityDto, "City data must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
-        return null;
+        //
+        Optional<City> result = cityRepository.findByIdAndCountry_Id(cityId, countryId);
+        City city = result.orElseThrow(() -> {
+            String s = String.format("Failed to update the city [%d] belonging to country [%d]", cityId, countryId);
+            return new DataNotFoundException(s);
+        });
+        // TODO: use mapstruct to map the attributes from dto to entity. (https://www.baeldung.com/spring-data-partial-update)
+        city.setName(cityDto.getName());
+        city = cityRepository.save(city);
+        //
+        return assembler.toModel(city);
     }
 
     /**
@@ -165,7 +193,7 @@ public class CityServiceImpl implements CityService {
     public void delete(Integer countryId, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
-        repository.deleteByIdAndCountry_Id(cityId, countryId);
+        cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
     }
 
     @Override
@@ -176,17 +204,17 @@ public class CityServiceImpl implements CityService {
         Page<City> cityEntityPage;
         if (Objects.isNull(name) || name.isBlank()) {
             // find all cities
-            cityEntityPage = repository.findAll(pageRequest);
+            cityEntityPage = cityRepository.findAll(pageRequest);
         } else {
             // finding pagination by name
-            cityEntityPage = repository.findAllByNameContainingIgnoreCase(name, pageRequest);
+            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCase(name, pageRequest);
         }
         return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
     }
 
     @Override
     public CollectionModel<CityDto> findAll() {
-        List<City> cityEntityList = repository.findAll();
+        List<City> cityEntityList = cityRepository.findAll();
         CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
         collectionModel.add(
                 linkTo(methodOn(CitySimpleController.class)
@@ -197,7 +225,7 @@ public class CityServiceImpl implements CityService {
     @Override
     public CollectionModel<CityDto> findByColumn(String name) {
         Assert.notNull(name, "Name must not be null!");
-        List<City> cityEntityList = repository.findAllByNameContainingIgnoreCase(name);
+        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCase(name);
         CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
         collectionModel.add(
                 linkTo(methodOn(CitySimpleController.class)

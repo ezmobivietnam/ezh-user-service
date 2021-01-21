@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -18,11 +19,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class CityDto extends RepresentationModel<CityDto> {
-    private int id;
+
+    @Null
+    private Integer id;
 
     @NotBlank
     @Size(min = 1, max = 50)
     private String name;
 
+    @Null
     private LocalDateTime lastUpdate;
 }

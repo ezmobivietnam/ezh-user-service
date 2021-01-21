@@ -12,12 +12,10 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 /**
  * Ref:
  * 1. https://www.baeldung.com/spring-pathvariable
+ * 2. https://programmer.group/spring-method-level-data-validation-validated-method-validation-postprocessor.html
  * <p>
  * Created by ezmobivietnam on 2021-01-15.
  */
@@ -61,29 +59,31 @@ public class CityController extends AbstractLevelOneController<CityDto> {
 
     @Override
     @GetMapping("/{childId}")
-    public ResponseEntity<CityDto> findById(@PathVariable Integer ownerId,
-                                            @PathVariable Integer childId) {
+    public ResponseEntity<CityDto> findById(@PathVariable @Min(1) Integer ownerId,
+                                            @PathVariable @Min(1) Integer childId) {
         log.debug(String.format("Country id=%s, city id=%s", ownerId, childId));
         return super.findById(ownerId, childId);
     }
 
+    @Override
     @PostMapping()
     public ResponseEntity<Void> addNew(@PathVariable @Min(1) Integer ownerId, @RequestBody @Valid CityDto model) {
         log.debug(String.format("Adding to the country [%d] the new city [%s]", ownerId, model));
-        cityService.addNew(ownerId, model);
-        return ResponseEntity.created(linkTo(methodOn(CityController.class).addNew(ownerId, model)).toUri()).build();
+        return super.addNew(ownerId, model);
     }
 
-    @PutMapping("/{cityId}")
+    @PutMapping("/{childId}")
     public ResponseEntity<Void> update(@PathVariable @Min(1) Integer ownerId,
                                        @RequestBody @Valid CityDto model,
-                                       @PathVariable @Min(1) int cityId) {
-        return null;
+                                       @PathVariable @Min(1) int childId) {
+        log.debug(String.format("Updating city info with country id=[%d], new city data=[%s], city id=[%d]",
+                ownerId, model, childId));
+        return super.update(ownerId, model, childId);
     }
 
     @Override
     @DeleteMapping("/{childId}")
-    public ResponseEntity<Void> delete(@PathVariable Integer ownerId, @PathVariable Integer childId) {
+    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer ownerId, @PathVariable @Min(1) Integer childId) {
         return super.delete(ownerId, childId);
     }
 
