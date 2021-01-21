@@ -175,8 +175,8 @@ public class CityServiceImpl implements CityService {
             String s = String.format("Failed to update the city [%d] belonging to country [%d]", cityId, countryId);
             return new DataNotFoundException(s);
         });
-        // TODO: use mapstruct to map the attributes from dto to entity. (https://www.baeldung.com/spring-data-partial-update)
-        city.setName(cityDto.getName());
+        // Use mapstruct to map the attributes from dto to entity. (https://www.baeldung.com/spring-data-partial-update)
+        mapper.updateCityFromCityDto(cityDto, city);
         city = cityRepository.save(city);
         //
         return assembler.toModel(city);
