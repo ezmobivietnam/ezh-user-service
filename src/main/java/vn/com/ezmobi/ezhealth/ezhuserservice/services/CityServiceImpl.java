@@ -29,10 +29,11 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 /**
  * Ref:
  * 1. https://www.baeldung.com/spring-data-partial-update
- *
+ * <p>
  * Created by ezmobivietnam on 2021-01-15.
  */
 @Slf4j
+@Transactional
 @Service
 public class CityServiceImpl implements CityService {
 
@@ -140,7 +141,6 @@ public class CityServiceImpl implements CityService {
      * @return
      */
     @Override
-    @Transactional
     public CityDto addNew(Integer countryId, CityDto cityDto) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityDto, "City data must not be null!");
@@ -164,7 +164,6 @@ public class CityServiceImpl implements CityService {
      * @return
      */
     @Override
-    @Transactional
     public CityDto update(Integer countryId, CityDto cityDto, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityDto, "City data must not be null!");
@@ -189,7 +188,6 @@ public class CityServiceImpl implements CityService {
      * @param cityId    (Required) the id of the item to be deleted
      */
     @Override
-    @Transactional
     public void delete(Integer countryId, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");

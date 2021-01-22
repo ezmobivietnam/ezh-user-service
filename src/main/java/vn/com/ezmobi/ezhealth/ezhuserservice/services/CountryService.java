@@ -9,19 +9,13 @@ import java.util.Optional;
 /**
  * Created by ezmobivietnam on 2021-01-04.
  */
-public interface CountryService {
+public interface CountryService extends BaseRootService<CountryDto> {
 
-    CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest);
-
-    CollectionModel<CountryDto> findAll();
-
-    Optional<CountryDto> findById(int id);
-
-    CollectionModel<CountryDto> findByName(String exp);
-
-    CountryDto add(CountryDto country);
-
-    CountryDto update(CountryDto country, int countryId);
-
-    void delete(int id);
+//    CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest);
+//    CollectionModel<CountryDto> findAll();
+//    Optional<CountryDto> findById(int id);
+//    CollectionModel<CountryDto> findByName(String exp);
+//    CountryDto add(CountryDto country);
+//    CountryDto update(CountryDto country, int countryId);
+//    void delete(int id);
 }

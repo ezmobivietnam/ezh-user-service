@@ -10,7 +10,10 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
+import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CountryAssembler;
+import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CountryMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import java.util.List;
@@ -27,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Created by ezmobivietnam on 2021-01-06.
  */
-@WebMvcTest(CountryController.class)
+@WebMvcTest({CountryController.class, CountryAssembler.class, CountryMapper.class})
 class CountryControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -35,13 +38,17 @@ class CountryControllerTest extends BaseControllerTest {
 
     @MockBean
     CountryService countryService;
-    private CountryDto vietnam;
-    private CountryDto laos;
+
+    @Autowired
+    CountryAssembler countryAssembler;
+
+    private Country vietnam;
+    private Country laos;
 
     @BeforeEach
     void setUp() {
-        vietnam = CountryDto.builder().id(1).name("Vietnam").build();
-        laos = CountryDto.builder().id(2).name("Laos").build();
+        vietnam = Country.builder().id(1).name("Vietnam").build();
+        laos = Country.builder().id(2).name("Laos").build();
     }
 
     @AfterEach
@@ -49,10 +56,11 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void findAll() throws Exception {
+    void findList() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
-        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
+//        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
+        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
@@ -63,7 +71,7 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void findAll_givenEmptyResult_thenReceiveOKStatusWithNoData() throws Exception {
+    void findList_givenEmptyResult_thenReceiveOKStatusWithNoData() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
         given(countryService.findAll()).willReturn(CollectionModel.empty());
@@ -75,10 +83,11 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void findAll_givenValidNameParam_thenFindByName() throws Exception {
+    void findList_givenValidNameParam_thenFindByName() throws Exception {
         // given
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
-        given(countryService.findByName(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
+//        given(countryService.findByColumn(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
+        given(countryService.findByColumn(anyString())).willReturn(countryAssembler.toCollectionModel(List.of(vietnam)));
 
         //when
         mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
@@ -88,10 +97,10 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void findAll_givenWrongParam_thenFindAll() throws Exception {
+    void findList_givenWrongParam_thenFindAll() throws Exception {
         // given
         String findByParamUrl = CountryController.BASE_URL + "?anotherparam=viet";
-        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
+        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByParamUrl).contentType(MediaType.APPLICATION_JSON))
@@ -105,7 +114,7 @@ class CountryControllerTest extends BaseControllerTest {
     void findByName_givenNameParamEmpty_thenFindAll() throws Exception {
         // given
         String findByEmptyNameUrl = CountryController.BASE_URL + "?name=";
-        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
+        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByEmptyNameUrl).contentType(MediaType.APPLICATION_JSON))
@@ -119,7 +128,7 @@ class CountryControllerTest extends BaseControllerTest {
     void findById() throws Exception {
         // given
         String findByIdlUrl = CountryController.BASE_URL + "/1";
-        given(countryService.findById(anyInt())).willReturn(Optional.of(vietnam));
+        given(countryService.findById(anyInt())).willReturn(Optional.of(countryAssembler.toModel(vietnam)));
 
         //when
         mockMvc.perform(get(findByIdlUrl).contentType(MediaType.APPLICATION_JSON))
@@ -150,11 +159,11 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void add() throws Exception {
+    void addNew() throws Exception {
         //given
         String postURL = CountryController.BASE_URL;
         CountryDto newCountry = CountryDto.builder().name("New country").build();
-        given(countryService.add(any())).willReturn(vietnam);
+        given(countryService.addNew(any())).willReturn(countryAssembler.toModel(vietnam));
         //then
         mockMvc.perform(
                 post(postURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(newCountry)))
@@ -165,7 +174,7 @@ class CountryControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void add_withEmptyName() throws Exception {
+    void addNew_withEmptyName() throws Exception {
         //given
         String postURL = CountryController.BASE_URL;
         //then
@@ -192,17 +201,15 @@ class CountryControllerTest extends BaseControllerTest {
          */
         //given
         String putURL = CountryController.BASE_URL + "/" + vietnam.getId();
-        CountryDto updatedCountry =
-                vietnam.builder().id(vietnam.getId()).name(vietnam.getName() + "_Updated").build();
-        given(countryService.update(vietnam, vietnam.getId()))
-                .willReturn(updatedCountry);
+        Country updatedCountry = Country.builder()
+                .id(vietnam.getId()).name(vietnam.getName() + "_Updated").build();
+        given(countryService.update(any(CountryDto.class), anyInt()))
+                .willReturn(countryAssembler.toModel(updatedCountry));
         // then
         mockMvc.perform(
-                put(putURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(vietnam)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$['id']", is(updatedCountry.getId())))
-                .andExpect(jsonPath("$['name']", is(updatedCountry.getName())))
-        ;
+                put(putURL).contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(CountryDto.builder().name(updatedCountry.getName()).build())))
+                .andExpect(status().isOk());
     }
 
     @Test

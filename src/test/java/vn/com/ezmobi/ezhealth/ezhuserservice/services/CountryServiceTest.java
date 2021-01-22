@@ -237,7 +237,7 @@ class CountryServiceTest {
     }
 
     @Test
-    void findByName() {
+    void findByColumn() {
         /**
          * Sample json format responded by findByName():
          * {
@@ -264,7 +264,7 @@ class CountryServiceTest {
         //given
         given(countryRepository.findByNameContainingIgnoreCase(anyString())).willReturn(List.of(vietnam));
         //when
-        CollectionModel<CountryDto> result = countryService.findByName(anyString());
+        CollectionModel<CountryDto> result = countryService.findByColumn(anyString());
         //then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
@@ -276,7 +276,7 @@ class CountryServiceTest {
         //given
         given(countryRepository.save(any(Country.class))).willReturn(vietnam);
         //when
-        CountryDto result = countryService.add(CountryDto.builder().id(vietnam.getId()).name(vietnam.getName()).build());
+        CountryDto result = countryService.addNew(CountryDto.builder().id(vietnam.getId()).name(vietnam.getName()).build());
         assertEquals(vietnam.getId(), result.getId());
         assertEquals(1, result.getLinks().stream().count());
     }

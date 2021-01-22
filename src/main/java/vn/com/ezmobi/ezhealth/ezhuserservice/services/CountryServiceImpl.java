@@ -28,6 +28,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * Created by ezmobivietnam on 2021-01-04.
  */
 @Slf4j
+@Transactional
 @Service
 public class CountryServiceImpl implements CountryService {
 
@@ -83,48 +84,45 @@ public class CountryServiceImpl implements CountryService {
         List<Country> countryList = countryRepository.findAll();
         CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countryList);
         collectionModel.add(linkTo(methodOn(CountryController.class)
-                .findAll(null, null, null)).withSelfRel().expand());
+                .findList(null, null, null)).withSelfRel().expand());
         //
         log.info("End loading country data. Will return data to caller right now.");
         return collectionModel;
     }
 
     @Override
-    public Optional<CountryDto> findById(int id) {
+    public Optional<CountryDto> findById(Integer id) {
         Optional<Country> result = countryRepository.findById(id);
         return result.map(countryAssembler::toModel);
     }
 
     @Override
-    public CollectionModel<CountryDto> findByName(String nameExp) {
+    public CollectionModel<CountryDto> findByColumn(String nameExp) {
         List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
         CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
         countryDtoModelList.add(linkTo(methodOn(CountryController.class)
-                .findAll(null, null, nameExp)).withSelfRel().expand());
+                .findList(nameExp, null, null)).withSelfRel().expand());
         return countryDtoModelList;
     }
 
     @Override
-    @Transactional
-    public CountryDto add(CountryDto countryDto) {
+    public CountryDto addNew(CountryDto countryDto) {
         Country country = countryRepository.save(countryMapper.countryDtoToCountry(countryDto));
         return countryAssembler.toModel(country);
     }
 
     @Override
-    @Transactional
-    public CountryDto update(CountryDto countryDto, final int countryId) {
-        Optional<Country> storedCountry = countryRepository.findById(countryId);
-        storedCountry.orElseThrow(() -> new DataNotFoundException(String.format("Updating country [%d] failed",
-                countryId)));
-        countryDto.setId(countryId);
-        Country countryEntity = countryRepository.save(countryMapper.countryDtoToCountry(countryDto));
-        return countryAssembler.toModel(countryEntity);
+    public CountryDto update(CountryDto countryDto, Integer countryId) {
+        Optional<Country> result = countryRepository.findById(countryId);
+        Country storedCountry = result.orElseThrow(() ->
+                new DataNotFoundException(String.format("Updating country [%d] failed", countryId)));
+        countryMapper.updateCountryFromCountryDto(countryDto, storedCountry);
+        storedCountry = countryRepository.save(storedCountry);
+        return countryAssembler.toModel(storedCountry);
     }
 
     @Override
-    @Transactional
-    public void delete(final int id) {
+    public void delete(final Integer id) {
         countryRepository.deleteById(id);
     }
 }

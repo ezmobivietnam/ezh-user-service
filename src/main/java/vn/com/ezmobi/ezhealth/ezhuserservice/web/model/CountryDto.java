@@ -32,6 +32,7 @@ public class CountryDto extends RepresentationModel<CountryDto> {
     @Size(min = 1, max = 50)
     private String name;
 
+    @Null
     private Set<CityDto> cities;
 
     @Null
