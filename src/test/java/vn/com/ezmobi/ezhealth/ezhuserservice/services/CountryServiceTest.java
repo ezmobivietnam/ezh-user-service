@@ -27,13 +27,11 @@ import static org.mockito.Mockito.verify;
 /**
  * Ref:
  * https://www.baeldung.com/junit-assertions
- * https://www.baeldung.com/spring-boot-exclude-auto-configuration-test
- * https://javarevisited.blogspot.com/2019/04/spring-boot-error-error-creating-bean.html#axzz6jZMAb89u
+ * https://github.com/spring-projects/spring-boot/issues/1454
  * <p>
  * Created by ezmobivietnam on 2021-01-12.
  */
 @SpringBootTest
-//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 class CountryServiceTest {
 
     @MockBean
