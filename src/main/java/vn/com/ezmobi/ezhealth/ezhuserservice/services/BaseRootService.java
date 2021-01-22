@@ -13,7 +13,7 @@ public interface BaseRootService<T extends RepresentationModel<? extends T>> ext
 
     T addNew(T representationModel);
 
-    T update(T representationModel, Integer countryId);
+    T update(T representationModel, Integer id);
 
     void delete(Integer id);
 }
