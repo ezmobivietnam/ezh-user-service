@@ -59,6 +59,9 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
                 // list all
                 collectionModel = getService().findAll(ownerId);
             }
+            if (collectionModel.getContent().isEmpty()) {
+               throw new DataNotFoundException();
+            }
             return ResponseEntity.ok(collectionModel);
         }
     }
