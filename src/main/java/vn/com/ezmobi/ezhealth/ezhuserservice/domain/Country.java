@@ -31,7 +31,7 @@ public class Country implements Serializable {
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
 
-    @OneToMany(mappedBy = "country")
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<City> cities;
