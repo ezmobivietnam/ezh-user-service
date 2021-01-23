@@ -30,8 +30,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
  * Ref:
@@ -41,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Created by ezmobivietnam on 2021-01-17.
  */
 @WebMvcTest(value = {CityController.class, CityMapper.class, CityAssembler.class})
-class CityControllerTest {
+class CityControllerTest extends BaseControllerTest {
 
     @MockBean
     private CityService service;
@@ -55,11 +57,12 @@ class CityControllerTest {
     private City batnaCityEntity;
     private City bcharCityEntity;
     private City skikdaCityEntity;
+    private Country algeriaCountryEntity;
 
     @BeforeEach
     void setUp() {
         //
-        Country algeriaCountryEntity = Country.builder().id(2).name("Algeria").build();
+        algeriaCountryEntity = Country.builder().id(2).name("Algeria").build();
         batnaCityEntity = City.builder().id(59).name("Batna").country(algeriaCountryEntity).build();
         bcharCityEntity = City.builder().id(63).name("Bchar").country(algeriaCountryEntity).build();
         skikdaCityEntity = City.builder().id(483).name("Skikda").country(algeriaCountryEntity).build();
@@ -166,6 +169,24 @@ class CityControllerTest {
     }
 
     @Test
+    void findList_givenNoParametersSet_thenListAllCities() throws Exception {
+        //given
+        int countryId = 2;
+        String url = String.format("http://localhost:8080/api/countries/%d/cities", countryId);
+        CollectionModel<CityDto> collectionModel = cityAssembler.toCollectionModel(List.of(batnaCityEntity,
+                bcharCityEntity, skikdaCityEntity));
+        collectionModel.add(
+                linkTo(methodOn(CityController.class)
+                        .findList(countryId, null, null, null)).withSelfRel().expand());
+        given(service.findAll(anyInt())).willReturn(collectionModel);
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.get(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$._links.self.href",
+                        is("/api/countries/2/cities")));
+    }
+
+    @Test
     void findById() throws Exception {
         //given
         int countryId = 2;
@@ -178,14 +199,45 @@ class CityControllerTest {
     }
 
     @Test
-    void addNew() {
+    void addNew() throws Exception {
+        //given
+        int countryId = 2;
+        String url = String.format("http://localhost:8080/api/countries/%d/cities", countryId);
+        City newCity = City.builder().id(1).name("New city").country(algeriaCountryEntity).build();
+        given(service.addNew(anyInt(), any(CityDto.class))).willReturn(cityAssembler.toModel(newCity));
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.post(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(CityDto.builder().name("New city").build())))
+                .andExpect(status().isCreated()).andExpect(header()
+                .exists("Location"));
     }
 
     @Test
-    void update() {
+    void update() throws Exception {
+        //given
+        int countryId = 2;
+        int cityId = 59;
+        City updatedCityEnity = City.builder().id(59).name("Batna_UPDATED").country(algeriaCountryEntity).build();
+        String url = String.format("http://localhost:8080/api/countries/%d/cities/%d", countryId, cityId);
+        given(service.update(anyInt(), any(CityDto.class), anyInt()))
+                .willReturn(cityAssembler.toModel(updatedCityEnity));
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.put(url)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(asJsonString(CityDto.builder().name("Batna_UPDATED").build())))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void delete() {
+    void delete() throws Exception {
+        //given
+        int countryId = 2;
+        int cityId = 59;
+        String url = String.format("http://localhost:8080/api/countries/%d/cities/%d", countryId, cityId);
+        willDoNothing().given(service).delete(anyInt(), anyInt());
+        //when
+        mockMvc.perform(MockMvcRequestBuilders.delete(url).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
     }
 }
