@@ -81,6 +81,22 @@ public class CityServiceImpl implements CityService {
         return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
     }
 
+    @Override
+    public CollectionModel<CityDto> findPaginated(String name, PageRequest pageRequest) {
+        Assert.notNull(pageRequest, "PageRequest must not be null!");
+        //
+        log.debug(String.format("Country name=%s, pageRequest=%s", name, pageRequest));
+        Page<City> cityEntityPage;
+        if (Objects.isNull(name) || name.isBlank()) {
+            // find all cities
+            cityEntityPage = cityRepository.findAll(pageRequest);
+        } else {
+            // finding pagination by name
+            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCase(name, pageRequest);
+        }
+        return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
+    }
+
     /**
      * Finding all cities (without pagination) belong to the country by countryId.
      *
@@ -95,6 +111,16 @@ public class CityServiceImpl implements CityService {
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
                         .findList(countryId, null, null, null)).withSelfRel().expand());
+        return collectionModel;
+    }
+
+    @Override
+    public CollectionModel<CityDto> findAll() {
+        List<City> cityEntityList = cityRepository.findAll();
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CitySimpleController.class)
+                        .findList(null, null, null)).withSelfRel().expand());
         return collectionModel;
     }
 
@@ -121,7 +147,7 @@ public class CityServiceImpl implements CityService {
      * @return
      */
     @Override
-    public CollectionModel<CityDto> findByName(Integer countryId, String name) {
+    public CollectionModel<CityDto> findByText(Integer countryId, String name) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(name, "City name must not be null!");
         List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId);
@@ -129,6 +155,17 @@ public class CityServiceImpl implements CityService {
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
                         .findList(countryId, name, null, null)).withSelfRel().expand());
+        return collectionModel;
+    }
+
+    @Override
+    public CollectionModel<CityDto> findByText(String name) {
+        Assert.notNull(name, "Name must not be null!");
+        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCase(name);
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+        collectionModel.add(
+                linkTo(methodOn(CitySimpleController.class)
+                        .findList(name, null, null)).withSelfRel().expand());
         return collectionModel;
     }
 
@@ -192,42 +229,4 @@ public class CityServiceImpl implements CityService {
         Assert.notNull(cityId, "City id must not be null!");
         cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
     }
-
-    @Override
-    public CollectionModel<CityDto> findPaginated(String name, PageRequest pageRequest) {
-        Assert.notNull(pageRequest, "PageRequest must not be null!");
-        //
-        log.debug(String.format("Country name=%s, pageRequest=%s", name, pageRequest));
-        Page<City> cityEntityPage;
-        if (Objects.isNull(name) || name.isBlank()) {
-            // find all cities
-            cityEntityPage = cityRepository.findAll(pageRequest);
-        } else {
-            // finding pagination by name
-            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCase(name, pageRequest);
-        }
-        return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
-    }
-
-    @Override
-    public CollectionModel<CityDto> findAll() {
-        List<City> cityEntityList = cityRepository.findAll();
-        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
-        collectionModel.add(
-                linkTo(methodOn(CitySimpleController.class)
-                        .findList(null, null, null)).withSelfRel().expand());
-        return collectionModel;
-    }
-
-    @Override
-    public CollectionModel<CityDto> findByColumn(String name) {
-        Assert.notNull(name, "Name must not be null!");
-        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCase(name);
-        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
-        collectionModel.add(
-                linkTo(methodOn(CitySimpleController.class)
-                        .findList(name, null, null)).withSelfRel().expand());
-        return collectionModel;
-    }
-
 }

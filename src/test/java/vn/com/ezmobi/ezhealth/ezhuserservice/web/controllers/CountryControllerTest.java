@@ -86,8 +86,8 @@ class CountryControllerTest extends BaseControllerTest {
     void findList_givenValidNameParam_thenFindByName() throws Exception {
         // given
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
-//        given(countryService.findByColumn(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
-        given(countryService.findByColumn(anyString())).willReturn(countryAssembler.toCollectionModel(List.of(vietnam)));
+//        given(countryService.findByText(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
+        given(countryService.findByText(anyString())).willReturn(countryAssembler.toCollectionModel(List.of(vietnam)));
 
         //when
         mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))

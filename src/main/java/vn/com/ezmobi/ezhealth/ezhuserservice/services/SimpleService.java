@@ -31,6 +31,6 @@ public interface SimpleService<T extends RepresentationModel<? extends T>> {
      * @param whatToFind something to be found
      * @return
      */
-    public CollectionModel<T> findByColumn(String whatToFind);
+    public CollectionModel<T> findByText(String whatToFind);
 
 }

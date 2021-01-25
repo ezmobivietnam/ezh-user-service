@@ -41,7 +41,7 @@ public abstract class AbstractSimpleController<T extends RepresentationModel<? e
             CollectionModel<T> collectionModel;
             if (Objects.nonNull(searchingName)) {
                 // list by name
-                collectionModel = getService().findByColumn(searchingName);
+                collectionModel = getService().findByText(searchingName);
             } else {
                 // list all
                 collectionModel = getService().findAll();

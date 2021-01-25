@@ -45,7 +45,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param name   (Required) the name of the item to be found
      * @return
      */
-    CollectionModel<T> findByName(Integer rootId, String name);
+    CollectionModel<T> findByText(Integer rootId, String name);
 
     /**
      * Adding new items to the root object.

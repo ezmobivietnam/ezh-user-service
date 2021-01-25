@@ -54,7 +54,7 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
             CollectionModel<T> collectionModel;
             if (Objects.nonNull(searchingName)) {
                 // list by name
-                collectionModel = getService().findByName(ownerId, searchingName);
+                collectionModel = getService().findByText(ownerId, searchingName);
             } else {
                 // list all
                 collectionModel = getService().findAll(ownerId);

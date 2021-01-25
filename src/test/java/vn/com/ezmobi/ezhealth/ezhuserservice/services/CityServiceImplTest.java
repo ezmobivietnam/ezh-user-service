@@ -206,13 +206,13 @@ class CityServiceImplTest {
      * 2. A self link
      */
     @Test
-    void findByName() {
+    void findByText() {
         // given
         List<City> cityEntities = List.of(city01Entity, city02Entity, city03Entity);
         given(cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(anyString(), anyInt()))
                 .willReturn(cityEntities);
         //when
-        CollectionModel<CityDto> cityDtoList = cityService.findByName(2, "a");
+        CollectionModel<CityDto> cityDtoList = cityService.findByText(2, "a");
         assertEquals(cityDtoList.getContent().size(), cityEntities.size());
         assertNotNull(cityDtoList.getLink(IanaLinkRelations.SELF_VALUE));
     }

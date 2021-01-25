@@ -97,7 +97,7 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public CollectionModel<CountryDto> findByColumn(String nameExp) {
+    public CollectionModel<CountryDto> findByText(String nameExp) {
         List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
         CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
         countryDtoModelList.add(linkTo(methodOn(CountryController.class)

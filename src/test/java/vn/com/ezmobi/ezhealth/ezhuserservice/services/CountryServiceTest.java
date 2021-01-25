@@ -237,7 +237,7 @@ class CountryServiceTest {
     }
 
     @Test
-    void findByColumn() {
+    void findByText() {
         /**
          * Sample json format responded by findByName():
          * {
@@ -264,7 +264,7 @@ class CountryServiceTest {
         //given
         given(countryRepository.findByNameContainingIgnoreCase(anyString())).willReturn(List.of(vietnam));
         //when
-        CollectionModel<CountryDto> result = countryService.findByColumn(anyString());
+        CollectionModel<CountryDto> result = countryService.findByText(anyString());
         //then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
