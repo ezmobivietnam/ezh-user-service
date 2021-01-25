@@ -116,16 +116,15 @@ public class CityServiceImpl implements CityService {
     /**
      * Finding cities belong to a country by name.
      *
-     * @param countryId (Optional) the country id
+     * @param countryId (Required) the country id
      * @param name      (Required) the name of the city to be found
      * @return
      */
     @Override
     public CollectionModel<CityDto> findByName(Integer countryId, String name) {
+        Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(name, "City name must not be null!");
-        List<City> cityEntityList = (Objects.nonNull(countryId)) ?
-                cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId) :
-                cityRepository.findAllByNameContainingIgnoreCase(name);
+        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId);
         CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
