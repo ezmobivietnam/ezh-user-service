@@ -27,6 +27,6 @@ public interface CityRepository extends JpaRepository<City, Integer>, JpaSpecifi
 
     Optional<City> findByIdAndCountry_Id(Integer cityId, Integer countryId);
 
-    int  deleteByIdAndCountry_Id(Integer cityId, Integer countryId);
+    void  deleteByIdAndCountry_Id(Integer cityId, Integer countryId);
 
 }

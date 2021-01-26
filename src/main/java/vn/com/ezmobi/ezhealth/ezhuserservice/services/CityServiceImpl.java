@@ -16,7 +16,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CityAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CityMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CityController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CitySimpleController;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.transaction.Transactional;
@@ -247,14 +246,9 @@ public class CityServiceImpl implements CityService {
      * @param cityId    (Required) the id of the item to be deleted
      */
     @Override
-    public int delete(Integer countryId, Integer cityId) {
+    public void delete(Integer countryId, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
-        int deletedRecords = cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
-        if (deletedRecords < 1) {
-            String s = String.format("Failed to delete the city [%d] of the country [%d]", cityId, countryId);
-            throw new TaskExecutionException(s);
-        }
-        return deletedRecords;
+        cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
     }
 }

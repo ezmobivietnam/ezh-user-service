@@ -71,7 +71,6 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      *
      * @param rootId     (Required) the root ID
      * @param levelOneId (Required) the id of the item to be deleted
-     * @return the number of record be deleted
      */
-    int delete(Integer rootId, Integer levelOneId);
+    void delete(Integer rootId, Integer levelOneId);
 }

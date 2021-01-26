@@ -15,7 +15,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.domain.City;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CityRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
@@ -25,6 +24,9 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * Created by ezmobivietnam on 2021-01-24.
@@ -489,28 +491,35 @@ class CityServiceImplTest {
     @Test
     void delete() {
         //given
-        given(cityRepository.deleteByIdAndCountry_Id(anyInt(), anyInt())).willReturn(1);
+        willDoNothing().given(cityRepository).deleteByIdAndCountry_Id(anyInt(), anyInt());
         //when
-        int deletedRecords = cityService.delete(2, 29);
+        cityService.delete(2, 29);
         //then
-        assertEquals(deletedRecords, 1);
+        verify(cityRepository, times(1)).deleteByIdAndCountry_Id(anyInt(), anyInt());
     }
 
     /**
      * Target method: CityService.delete(Integer countryId, Integer cityId)
      */
     @Test
-    void delete_givenNoDBRecordDeleted_thenThrowsException() {
-        //given
-        Integer countryId = 2;
-        Integer cityId = 59;
-        given(cityRepository.deleteByIdAndCountry_Id(anyInt(), anyInt())).willReturn(0);
-        //when
-        Exception exception = assertThrows(TaskExecutionException.class, () -> {
-            cityService.delete(countryId, cityId);
+    void delete_givenNullCountryId_thenThrowsException() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            cityService.delete(null, 59);
         });
-        //then
-        String expectedMessage = String.format("Failed to delete the city [%d] of the country [%d]", cityId, countryId);
+        String expectedMessage = "Country id must not be null!";
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    /**
+     * Target method: CityService.delete(Integer countryId, Integer cityId)
+     */
+    @Test
+    void delete_givenNullCityId_thenThrowsException() {
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            cityService.delete(2, null);
+        });
+        String expectedMessage = "City id must not be null!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }
