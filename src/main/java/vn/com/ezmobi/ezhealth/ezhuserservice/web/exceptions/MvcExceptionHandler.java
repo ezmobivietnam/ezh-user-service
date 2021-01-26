@@ -9,6 +9,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -57,6 +59,12 @@ public class MvcExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(TaskExecutionException.class)
+    public ResponseEntity<String> taskExecutionError(TaskExecutionException exc) {
+        log.error("Execution Client requests error", exc);
+        return ResponseEntity.badRequest().body(exc.getMessage());
     }
 
     @ExceptionHandler(DataNotFoundException.class)

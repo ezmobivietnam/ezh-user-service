@@ -10,10 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CountryAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CountryMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CountryController;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.transaction.Transactional;
@@ -115,7 +116,7 @@ public class CountryServiceImpl implements CountryService {
     public CountryDto update(CountryDto countryDto, Integer countryId) {
         Optional<Country> result = countryRepository.findById(countryId);
         Country storedCountry = result.orElseThrow(() ->
-                new DataNotFoundException(String.format("Updating country [%d] failed", countryId)));
+                new TaskExecutionException(String.format("Updating country [%d] failed", countryId)));
         countryMapper.updateCountryFromCountryDto(countryDto, storedCountry);
         storedCountry = countryRepository.save(storedCountry);
         return countryAssembler.toModel(storedCountry);

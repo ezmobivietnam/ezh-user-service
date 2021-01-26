@@ -6,6 +6,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -41,6 +43,13 @@ public class Country implements Serializable {
         this.id = id;
         this.name = name;
         this.cities = cities;
+    }
+
+    public Set<City> getCities() {
+        if (Objects.isNull(this.cities)) {
+            this.cities = new HashSet<City>();
+        }
+        return cities;
     }
 
     /**

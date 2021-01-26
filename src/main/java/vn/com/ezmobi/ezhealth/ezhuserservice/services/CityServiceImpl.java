@@ -11,11 +11,12 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.domain.City;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CityRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CityAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CityMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CityController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CitySimpleController;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.transaction.Transactional;
@@ -81,6 +82,13 @@ public class CityServiceImpl implements CityService {
         return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
     }
 
+    /**
+     * Finding cities with pagination WITHOUT constraint to a countryId.
+     *
+     * @param name
+     * @param pageRequest (Required) the page request
+     * @return
+     */
     @Override
     public CollectionModel<CityDto> findPaginated(String name, PageRequest pageRequest) {
         Assert.notNull(pageRequest, "PageRequest must not be null!");
@@ -114,6 +122,11 @@ public class CityServiceImpl implements CityService {
         return collectionModel;
     }
 
+    /**
+     * Find and return all cities from DB.
+     *
+     * @return
+     */
     @Override
     public CollectionModel<CityDto> findAll() {
         List<City> cityEntityList = cityRepository.findAll();
@@ -158,6 +171,12 @@ public class CityServiceImpl implements CityService {
         return collectionModel;
     }
 
+    /**
+     * Find all cities by the given name without constraint to a country id
+     *
+     * @param name (Required) searching name
+     * @return
+     */
     @Override
     public CollectionModel<CityDto> findByText(String name) {
         Assert.notNull(name, "Name must not be null!");
@@ -183,9 +202,10 @@ public class CityServiceImpl implements CityService {
         Optional<Country> result = countryRepository.findById(countryId);
         Country country = result.orElseThrow(() -> {
             String s = String.format("Country [%] does not exist", countryId);
-            return new DataNotFoundException(s);
+            return new TaskExecutionException(s);
         });
         City city = mapper.cityDtoToCity(cityDto);
+        //TODO: what happens if cityDto has been set an id before persisting to DB?
         country.add(city);
         city = cityRepository.save(city);
         return assembler.toModel(city);
@@ -207,10 +227,13 @@ public class CityServiceImpl implements CityService {
         //
         Optional<City> result = cityRepository.findByIdAndCountry_Id(cityId, countryId);
         City city = result.orElseThrow(() -> {
-            String s = String.format("Failed to update the city [%d] belonging to country [%d]", cityId, countryId);
-            return new DataNotFoundException(s);
+            String s = String.format("Failed to search the city [%d] of the country [%d]", cityId, countryId);
+            return new TaskExecutionException(s);
         });
-        // Use mapstruct to map the attributes from dto to entity. (https://www.baeldung.com/spring-data-partial-update)
+        /**
+         * Use mapstruct to map the nonnull attributes from dto to entity.
+         * (https://www.baeldung.com/spring-data-partial-update)
+         */
         mapper.updateCityFromCityDto(cityDto, city);
         city = cityRepository.save(city);
         //
@@ -224,9 +247,14 @@ public class CityServiceImpl implements CityService {
      * @param cityId    (Required) the id of the item to be deleted
      */
     @Override
-    public void delete(Integer countryId, Integer cityId) {
+    public int delete(Integer countryId, Integer cityId) {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
-        cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
+        int deletedRecords = cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
+        if (deletedRecords < 1) {
+            String s = String.format("Failed to delete the city [%d] of the country [%d]", cityId, countryId);
+            throw new TaskExecutionException(s);
+        }
+        return deletedRecords;
     }
 }

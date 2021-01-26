@@ -1,4 +1,4 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions;
+package vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions;
 
 /**
  * Created by ezmobivietnam on 2021-01-06.

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.validation.Valid;

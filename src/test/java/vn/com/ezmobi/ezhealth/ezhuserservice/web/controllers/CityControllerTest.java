@@ -235,7 +235,7 @@ class CityControllerTest extends BaseControllerTest {
         int countryId = 2;
         int cityId = 59;
         String url = String.format("http://localhost:8080/api/countries/%d/cities/%d", countryId, cityId);
-        willDoNothing().given(service).delete(anyInt(), anyInt());
+        given(service.delete(anyInt(), anyInt())).willReturn(1);
         //when
         mockMvc.perform(MockMvcRequestBuilders.delete(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());

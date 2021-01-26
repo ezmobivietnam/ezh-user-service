@@ -1,24 +1,18 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseRootService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.Objects;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * Created by ezmobivietnam on 2021-01-04.

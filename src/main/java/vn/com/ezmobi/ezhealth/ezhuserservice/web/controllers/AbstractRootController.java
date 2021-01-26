@@ -5,7 +5,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseRootService;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
