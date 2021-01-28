@@ -14,7 +14,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionEx
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.CountryAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.CountryMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CountryController;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.transaction.Transactional;
@@ -80,25 +79,27 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public CollectionModel<CountryDto> findAll() {
-        log.info("Start loading country data");
+        log.info("Start finding country data");
         //
         List<Country> countryList = countryRepository.findAll();
         CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countryList);
         collectionModel.add(linkTo(methodOn(CountryController.class)
                 .findList(null, null, null)).withSelfRel().expand());
         //
-        log.info("End loading country data. Will return data to caller right now.");
+        log.info("End finding country data. Will return data to caller right now.");
         return collectionModel;
     }
 
     @Override
     public Optional<CountryDto> findById(Integer id) {
+        Assert.notNull(id, "Country id must not be null!");
         Optional<Country> result = countryRepository.findById(id);
         return result.map(countryAssembler::toModel);
     }
 
     @Override
     public CollectionModel<CountryDto> findByText(String nameExp) {
+        Assert.hasLength(nameExp, "Name must not be null and must not the empty!");
         List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
         CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
         countryDtoModelList.add(linkTo(methodOn(CountryController.class)
@@ -108,12 +109,15 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public CountryDto addNew(CountryDto countryDto) {
+        Assert.notNull(countryDto, "Country data must not be null!");
         Country country = countryRepository.save(countryMapper.countryDtoToCountry(countryDto));
         return countryAssembler.toModel(country);
     }
 
     @Override
     public CountryDto update(CountryDto countryDto, Integer countryId) {
+        Assert.notNull(countryDto, "Country data must not be null!");
+        Assert.notNull(countryId, "Country id must not be null!");
         Optional<Country> result = countryRepository.findById(countryId);
         Country storedCountry = result.orElseThrow(() ->
                 new TaskExecutionException(String.format("Updating country [%d] failed", countryId)));
@@ -123,7 +127,8 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public void delete(final Integer id) {
-        countryRepository.deleteById(id);
+    public void delete(final Integer countryId) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        countryRepository.deleteById(countryId);
     }
 }

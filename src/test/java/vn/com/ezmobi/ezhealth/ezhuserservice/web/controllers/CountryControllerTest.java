@@ -19,15 +19,19 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 /**
+ * Ref: https://www.baeldung.com/hamcrest-text-matchers
+ *
  * Created by ezmobivietnam on 2021-01-06.
  */
 @WebMvcTest({CountryController.class, CountryAssembler.class, CountryMapper.class})
@@ -55,45 +59,96 @@ class CountryControllerTest extends BaseControllerTest {
     void tearDown() {
     }
 
+    /**
+     * Given:
+     * 1. Target endpoint {http://localhost:8080/api/countries} is used.
+     * 2. There is no parameters are used
+     * 3. There are two countries returned from the method CountryService.findAll()
+     * <p>
+     * When:
+     * 1. The endpoint is called by using the GET method
+     * <p>
+     * Then expect:
+     * 1. Client will receive the list of two countries in json format
+     * 2. The "self" link is added to the response
+     *
+     * @throws Exception
+     */
     @Test
     void findList() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
-//        given(countryService.findAll()).willReturn(CollectionModel.of(List.of(vietnam, laos)));
-        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
+        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(List.of(vietnam, laos));
+        collectionModel.add(linkTo(methodOn(CountryController.class)
+                .findList(null, null, null)).withSelfRel().expand());
+        given(countryService.findAll()).willReturn(collectionModel);
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(2)))
-                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
-                .andExpect(jsonPath("$['_embedded']['countryDtoList'][1]['name']", is(laos.getName())));
+//                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
+//                .andExpect(jsonPath("$['_embedded']['countryDtoList'][1]['name']", is(laos.getName())))
+                .andExpect(jsonPath("$._embedded.countryDtoList[0].name", is(vietnam.getName())))
+                .andExpect(jsonPath("$._embedded.countryDtoList[1].name", is(laos.getName())))
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries")));
     }
 
+    /**
+     * Given:
+     * 1. Target endpoint {http://localhost:8080/api/countries} is used.
+     * 2. There is no parameters are used
+     * 3. The method CountryService.findAll() return empty collection
+     * <p>
+     * When: The endpoint is called by using the GET method
+     * <p>
+     * Then expect:
+     * 1. Only the "self" link is added to the response.
+     *
+     * @throws Exception
+     */
     @Test
     void findList_givenEmptyResult_thenReceiveOKStatusWithNoData() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
-        given(countryService.findAll()).willReturn(CollectionModel.empty());
+        given(countryService.findAll()).willReturn(CollectionModel.empty()
+                .add(linkTo(methodOn(CountryController.class).findList(null, null, null))
+                        .withSelfRel().expand()));
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$['_embedded']").doesNotExist());
+                .andExpect(jsonPath("$['_embedded']").doesNotExist())
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries")));
     }
 
+    /**
+     * Given:
+     * 1. Target endpoint {http://localhost:8080/api/countries} is used.
+     * 2. The parameter "name" is set to the value "viet"
+     * 3. The method CountryService.findByText() return collection included ONE element
+     * When: The endpoint is called by using the GET method
+     * Then expect:
+     * 1. Client will receive the list of ONE country in json format
+     * 2. The "self" link is added to the response
+     *
+     * @throws Exception
+     */
     @Test
     void findList_givenValidNameParam_thenFindByName() throws Exception {
         // given
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
-//        given(countryService.findByText(anyString())).willReturn(CollectionModel.of(List.of(vietnam)));
-        given(countryService.findByText(anyString())).willReturn(countryAssembler.toCollectionModel(List.of(vietnam)));
+        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(List.of(vietnam));
+        collectionModel.add(linkTo(methodOn(CountryController.class)
+                .findList("viet", null, null)).withSelfRel().expand());
+        given(countryService.findByText(anyString())).willReturn(collectionModel);
 
         //when
         mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['id']", is(vietnam.getId())))
-                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())));
+                .andExpect(jsonPath("$['_embedded']['countryDtoList'][0]['name']", is(vietnam.getName())))
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?name=viet")));;
     }
 
     @Test
