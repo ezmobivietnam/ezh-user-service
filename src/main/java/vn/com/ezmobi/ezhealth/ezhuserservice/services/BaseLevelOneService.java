@@ -3,12 +3,15 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.Optional;
 
 /**
  * Created by ezmobivietnam on 2021-01-16.
  */
+@Validated
 public interface BaseLevelOneService<T extends RepresentationModel<? extends T>> extends SimpleService {
 
     /**
@@ -54,7 +57,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param representationModel
      * @return
      */
-    T addNew(Integer rootId, T representationModel);
+    T addNew(Integer rootId, @Valid T representationModel);
 
     /**
      * Updating an existing item belong to the root object.
@@ -64,7 +67,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param levelOneId          (Required) the id of the item to be updated
      * @return
      */
-    T update(Integer rootId, T representationModel, Integer levelOneId);
+    T update(Integer rootId, @Valid T representationModel, Integer levelOneId);
 
     /**
      * Deleting an item from the root object.

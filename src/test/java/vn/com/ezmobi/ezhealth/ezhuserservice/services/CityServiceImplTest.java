@@ -18,6 +18,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
@@ -368,7 +369,7 @@ class CityServiceImplTest {
     @Test
     void addNew_givenNullCountryId_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            cityService.addNew(null, CityDto.builder().build());
+            cityService.addNew(null, CityDto.builder().name("City name").build());
         });
         String expectedMessage = "Country id must not be null!";
         String actualMessage = exception.getMessage();
@@ -386,6 +387,16 @@ class CityServiceImplTest {
         String expectedMessage = "City data must not be null!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    /**
+     * Target method: CityService.addNew(Integer countryId, CityDto cityDto)
+     */
+    @Test
+    void addNew_givenInvalidCityDto_thenThrowsException() {
+        assertThrows(ConstraintViolationException.class, () -> {
+            cityService.addNew(2, CityDto.builder().build());
+        });
     }
 
     /**
@@ -435,7 +446,7 @@ class CityServiceImplTest {
     void update_givenNullCountryID_thenThrowsException() {
         //given
         Integer countryId = null;
-        CityDto cityDto = CityDto.builder().build();
+        CityDto cityDto = CityDto.builder().name("City name").build();
         Integer cityId = 59;
         //when
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -473,7 +484,7 @@ class CityServiceImplTest {
     void update_givenNullCityId_thenThrowsException() {
         //given
         Integer countryId = 2;
-        CityDto cityDto = CityDto.builder().build();
+        CityDto cityDto = CityDto.builder().name("City name").build();
         Integer cityId = null;
         //when
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -483,6 +494,16 @@ class CityServiceImplTest {
         String expectedMessage = "City id must not be null!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    /**
+     * Target method: CityService.update(Integer countryId, CityDto cityDto, Integer cityId)
+     */
+    @Test
+    void update_givenInvalidCityDto_thenThrowsException() {
+        assertThrows(ConstraintViolationException.class, () -> {
+            cityService.update(2, CityDto.builder().build(), 59);
+        });
     }
 
     /**
