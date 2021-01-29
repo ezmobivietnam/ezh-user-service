@@ -12,8 +12,6 @@ import java.util.Set;
 
 @NoArgsConstructor
 @Data
-@ToString
-@EqualsAndHashCode
 @Entity
 @Table(name = "country")
 public class Country implements Serializable {
