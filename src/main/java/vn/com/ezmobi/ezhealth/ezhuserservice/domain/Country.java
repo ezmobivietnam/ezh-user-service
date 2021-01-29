@@ -23,7 +23,7 @@ public class Country implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "country_id", nullable = false)
-    @EqualsAndHashCode.Include
+//    @EqualsAndHashCode.Include
     private int id;
 
     @Column(name = "country", nullable = false)

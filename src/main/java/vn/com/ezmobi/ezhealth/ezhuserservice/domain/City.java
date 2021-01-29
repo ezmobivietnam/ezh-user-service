@@ -1,14 +1,12 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @NoArgsConstructor
 @Data
@@ -21,7 +19,7 @@ public class City implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "city_id", nullable = false)
-    @EqualsAndHashCode.Include
+//    @EqualsAndHashCode.Include
     private int id;
 
     @Column(name = "city", nullable = false)
@@ -34,6 +32,11 @@ public class City implements Serializable {
     @Column(name = "last_update", nullable = false)
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
+
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Set<Address> addresses;
 
     @Builder
     public City(int id, String name, Country country) {

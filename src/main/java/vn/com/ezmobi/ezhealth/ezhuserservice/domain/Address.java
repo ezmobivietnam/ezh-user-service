@@ -7,9 +7,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+@Data
 @Entity
 @Table(name = "address")
-@Data
 public class Address implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,8 +28,9 @@ public class Address implements Serializable {
     @Column(name = "district", nullable = false)
     private String district;
 
-    @Column(name = "city_id", nullable = false)
-    private Integer cityId;
+    @ManyToOne
+    @JoinColumn(name = "city_id", nullable = false)
+    private City city;
 
     @Column(name = "postal_code")
     private String postalCode;
@@ -37,11 +38,7 @@ public class Address implements Serializable {
     @Column(name = "phone", nullable = false)
     private String phone;
 
-    @Column(name = "location", nullable = false)
-    private String location;
-
     @Column(name = "last_update", nullable = false)
     @UpdateTimestamp
     private LocalDateTime lastUpdate;
-
 }
