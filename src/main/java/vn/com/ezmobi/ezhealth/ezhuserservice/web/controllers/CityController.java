@@ -25,7 +25,7 @@ import javax.validation.constraints.Min;
 @RestController
 public class CityController extends AbstractLevelOneController<CityDto> {
 
-    public static final String BASE_URL = "/api/countries/{ownerId}/cities";
+    public static final String BASE_URL = "/api/countries/{countryId}/cities";
 
     private final CityService cityService;
 
@@ -38,53 +38,57 @@ public class CityController extends AbstractLevelOneController<CityDto> {
      * Sample usage:
      * http://localhost:8080/api/countries/2/cities/?page=0&size=2&name=a
      *
-     * @param ownerId (Required) null value indicates search all city without constraint to a country
-     * @param name    (Optional) null value indicates search all
-     * @param page    (Optional) null value indicates searching result is paginated and the page {page} is display
-     * @param size    (Optional) null value indicates searching result is paginated and the size of page is {size}
+     * @param countryId (Required) null value indicates search all city without constraint to a country
+     * @param name      (Optional) null value indicates search all
+     * @param page      (Optional) null value indicates searching result is paginated and the page {page} is display
+     * @param size      (Optional) null value indicates searching result is paginated and the size of page is {size}
      * @return
      */
     @Override
     @GetMapping()
     public ResponseEntity<CollectionModel<CityDto>> findList(
-            @PathVariable Integer ownerId,
+            @PathVariable Integer countryId,
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {
 
         log.debug(String.format("Finding cities with conditions: countryId=%d, pageNumber=%d, pageSize=%d, name=%s",
-                ownerId, page, size, name));
-        return super.findList(ownerId, name, page, size);
+                countryId, page, size, name));
+        return super.findList(countryId, name, page, size);
     }
 
     @Override
-    @GetMapping("/{childId}")
-    public ResponseEntity<CityDto> findById(@PathVariable @Min(1) Integer ownerId,
-                                            @PathVariable @Min(1) Integer childId) {
-        log.debug(String.format("Country id=%s, city id=%s", ownerId, childId));
-        return super.findById(ownerId, childId);
+    @GetMapping("/{cityId}")
+    public ResponseEntity<CityDto> findById(@PathVariable @Min(1) Integer countryId,
+                                            @PathVariable @Min(1) Integer cityId) {
+        log.debug(String.format("Country id=%s, city id=%s", countryId, cityId));
+        return super.findById(countryId, cityId);
     }
 
     @Override
     @PostMapping()
-    public ResponseEntity<Void> addNew(@PathVariable @Min(1) Integer ownerId, @RequestBody @Valid CityDto model) {
-        log.debug(String.format("Adding to the country [%d] the new city [%s]", ownerId, model));
-        return super.addNew(ownerId, model);
+    public ResponseEntity<Void> addNew(
+            @PathVariable @Min(1) Integer countryId,
+            @RequestBody @Valid CityDto model) {
+        log.debug(String.format("Adding to the country [%d] the new city [%s]", countryId, model));
+        return super.addNew(countryId, model);
     }
 
-    @PutMapping("/{childId}")
-    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer ownerId,
+    @PutMapping("/{cityId}")
+    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer countryId,
                                        @RequestBody @Valid CityDto model,
-                                       @PathVariable @Min(1) int childId) {
+                                       @PathVariable @Min(1) Integer cityId) {
         log.debug(String.format("Updating city info with country id=[%d], new city data=[%s], city id=[%d]",
-                ownerId, model, childId));
-        return super.update(ownerId, model, childId);
+                countryId, model, cityId));
+        return super.update(countryId, model, cityId);
     }
 
     @Override
-    @DeleteMapping("/{childId}")
-    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer ownerId, @PathVariable @Min(1) Integer childId) {
-        return super.delete(ownerId, childId);
+    @DeleteMapping("/{cityId}")
+    public ResponseEntity<Void> delete(
+            @PathVariable @Min(1) Integer countryId,
+            @PathVariable @Min(1) Integer cityId) {
+        return super.delete(countryId, cityId);
     }
 
     @Override

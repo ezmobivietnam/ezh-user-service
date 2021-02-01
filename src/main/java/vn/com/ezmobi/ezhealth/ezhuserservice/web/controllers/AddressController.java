@@ -1,0 +1,69 @@
+package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
+
+import javax.validation.constraints.Min;
+import java.util.List;
+
+/**
+ * Created by ezmobivietnam on 2021-01-29.
+ */
+@Slf4j
+@Validated
+@RequestMapping(AddressController.BASE_URL)
+@RestController
+public class AddressController extends AbstractLevelTwoController<AddressDto> {
+
+    public static final String BASE_URL = "/api/countries/{countryId}/cities/{cityId}/addresses";
+
+    private final AddressService addressService;
+
+    public AddressController(AddressService addressService) {
+        this.addressService = addressService;
+    }
+
+    /**
+     * Find and return a list of RepresentationModel.
+     *
+     * @param countryId      (Required) The id of the country
+     * @param cityId         (Required) The id of the city
+     * @param withAddressIds (Optional) filtering the result by the level two id
+     * @param withAddress    (Optional) filtering the result with searching text. Null value indicates search all
+     * @param page           (Optional) null value indicates searching result is paginated and the page {page} is display
+     * @param size           (Optional) null value indicates searching result is paginated and the size of page is {size}
+     * @return
+     */
+    @Override
+    @GetMapping
+    public ResponseEntity<CollectionModel<AddressDto>> findList(
+            @PathVariable Integer countryId,
+            @PathVariable Integer cityId,
+            @RequestParam(name = "addressIds", required = false) List<Integer> withAddressIds,
+            @RequestParam(name = "address", required = false) String withAddress,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "size", required = false) Integer size) {
+        return super.findList(countryId, cityId, withAddressIds, withAddress, page, size);
+    }
+
+    @Override
+    @GetMapping("/{addressId}")
+    public ResponseEntity<AddressDto> findById(
+            @PathVariable @Min(1) Integer countryId,
+            @PathVariable @Min(1) Integer cityId,
+            @PathVariable @Min(1) Integer addressId) {
+
+        return super.findById(countryId, cityId, addressId);
+    }
+
+    @Override
+    protected BaseLevelTwoService getService() {
+        return addressService;
+    }
+}
