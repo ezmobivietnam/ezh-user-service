@@ -9,6 +9,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 
@@ -60,6 +61,31 @@ public class AddressController extends AbstractLevelTwoController<AddressDto> {
             @PathVariable @Min(1) Integer addressId) {
 
         return super.findById(countryId, cityId, addressId);
+    }
+
+    @Override
+    @PostMapping
+    public ResponseEntity<Void> addNew(@PathVariable @Min(1) Integer countryId,
+                                       @PathVariable @Min(1) Integer cityId,
+                                       @RequestBody @Valid AddressDto model) {
+        return super.addNew(countryId, cityId, model);
+    }
+
+    @Override
+    @PutMapping("/{addressId}")
+    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer countryId,
+                                       @PathVariable @Min(1) Integer cityId,
+                                       @RequestBody @Valid AddressDto model,
+                                       @PathVariable @Min(1) Integer addressId) {
+        return super.update(countryId, cityId, model, addressId);
+    }
+
+    @Override
+    @DeleteMapping("/{addressId}")
+    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer countryId,
+                                       @PathVariable @Min(1) Integer cityId,
+                                       @PathVariable @Min(1) Integer addressId) {
+        return super.delete(countryId, cityId, addressId);
     }
 
     @Override

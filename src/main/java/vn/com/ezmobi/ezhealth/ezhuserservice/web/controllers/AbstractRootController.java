@@ -15,8 +15,8 @@ import java.util.Optional;
  * Created by ezmobivietnam on 2021-01-15.
  */
 @Validated
-public abstract class AbstractRootController<T extends RepresentationModel<? extends T>>
-        extends AbstractSimpleController<T> {
+public abstract class AbstractRootController<T extends RepresentationModel<? extends T>, ID>
+        extends AbstractSimpleController<T, ID> {
 
     /**
      * Adding new model.

@@ -10,15 +10,19 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Address;
+import vn.com.ezmobi.ezhealth.ezhuserservice.domain.City;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.AddressRepository;
+import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CityRepository;
+import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.assemblers.AddressAssembler;
 import vn.com.ezmobi.ezhealth.ezhuserservice.utils.mappers.AddressMapper;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.AddressController;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.AddressSimpleController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -32,13 +36,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Service
 public class AddressServiceImpl implements AddressService {
 
-    private final AddressRepository repository;
+    private final AddressRepository addressRepository;
+    private final CityRepository cityRepository;
     private final AddressMapper mapper;
     private final AddressAssembler addressAssembler;
     private final PagedResourcesAssembler pagedResourcesAssembler;
 
-    public AddressServiceImpl(AddressRepository repository, AddressMapper mapper, AddressAssembler addressAssembler, PagedResourcesAssembler pagedResourcesAssembler) {
-        this.repository = repository;
+    public AddressServiceImpl(AddressRepository addressRepository,
+                              CityRepository cityRepository,
+                              AddressMapper mapper,
+                              AddressAssembler addressAssembler,
+                              PagedResourcesAssembler pagedResourcesAssembler) {
+        this.addressRepository = addressRepository;
+        this.cityRepository = cityRepository;
         this.mapper = mapper;
         this.addressAssembler = addressAssembler;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
@@ -66,20 +76,20 @@ public class AddressServiceImpl implements AddressService {
         Assert.notNull(cityId, "City id must not be null!");
         Assert.notNull(pageRequest, "PageRequest must not be null!");
         Page<Address> addressesPage;
-        if(!CollectionUtils.isEmpty(withAddressIdList) && StringUtils.hasLength(withAddress)) {
+        if (!CollectionUtils.isEmpty(withAddressIdList) && StringUtils.hasLength(withAddress)) {
             // query data using all parameters
-            addressesPage = repository.findAllByIdInAndAddressContainingIgnoreCaseAndCity_IdAndCity_Country_Id(
+            addressesPage = addressRepository.findAllByIdInAndAddressContainingIgnoreCaseAndCity_IdAndCity_Country_Id(
                     withAddressIdList, withAddress, cityId, countryId, pageRequest);
         } else if (!CollectionUtils.isEmpty(withAddressIdList)) {
             // query data using parameters countryId, cityId and withAddressIdList
-            addressesPage = repository.findAllByIdInAndCity_IdAndCity_Country_Id(withAddressIdList, cityId, countryId, pageRequest);
+            addressesPage = addressRepository.findAllByIdInAndCity_IdAndCity_Country_Id(withAddressIdList, cityId, countryId, pageRequest);
         } else if (StringUtils.hasLength(withAddress)) {
             // query data using parameters countryId, cityId and withAddress
-            addressesPage = repository.findAllByCity_IdAndCity_Country_IdAndAddressContainingIgnoreCase(cityId, countryId
+            addressesPage = addressRepository.findAllByCity_IdAndCity_Country_IdAndAddressContainingIgnoreCase(cityId, countryId
                     , withAddress, pageRequest);
         } else {
             // query data using two mandatory parameters countryId and cityId
-            addressesPage = repository.findAllByCity_IdAndCity_Country_Id(cityId, countryId, pageRequest);
+            addressesPage = addressRepository.findAllByCity_IdAndCity_Country_Id(cityId, countryId, pageRequest);
         }
         //
         return pagedResourcesAssembler.toModel(addressesPage, addressAssembler);
@@ -104,20 +114,20 @@ public class AddressServiceImpl implements AddressService {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
         List<Address> entities;
-        if(!CollectionUtils.isEmpty(withAddressIdList) && StringUtils.hasLength(withAddress)) {
+        if (!CollectionUtils.isEmpty(withAddressIdList) && StringUtils.hasLength(withAddress)) {
             // query data using all parameters
-            entities = repository.findAllByIdInAndAddressContainingIgnoreCaseAndCity_IdAndCity_Country_Id(
+            entities = addressRepository.findAllByIdInAndAddressContainingIgnoreCaseAndCity_IdAndCity_Country_Id(
                     withAddressIdList, withAddress, cityId, countryId);
         } else if (!CollectionUtils.isEmpty(withAddressIdList)) {
             // query data using parameters countryId, cityId and withAddressIdList
-            entities = repository.findAllByIdInAndCity_IdAndCity_Country_Id(withAddressIdList, cityId, countryId);
+            entities = addressRepository.findAllByIdInAndCity_IdAndCity_Country_Id(withAddressIdList, cityId, countryId);
         } else if (StringUtils.hasLength(withAddress)) {
             // query data using parameters countryId, cityId and withAddress
-            entities = repository.findAllByCity_IdAndCity_Country_IdAndAddressContainingIgnoreCase(cityId, countryId
+            entities = addressRepository.findAllByCity_IdAndCity_Country_IdAndAddressContainingIgnoreCase(cityId, countryId
                     , withAddress);
         } else {
             // query data using two mandatory parameters countryId and cityId
-            entities = repository.findAllByCity_IdAndCity_Country_Id(cityId, countryId);
+            entities = addressRepository.findAllByCity_IdAndCity_Country_Id(cityId, countryId);
         }
         CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(entities);
         collectionModel.add(linkTo(methodOn(AddressController.class).findList(countryId, cityId, withAddressIdList,
@@ -139,8 +149,76 @@ public class AddressServiceImpl implements AddressService {
         Assert.notNull(countryId, "Country id must not be null!");
         Assert.notNull(cityId, "City id must not be null!");
         Assert.notNull(cityId, "Address id must not be null!");
-        Optional<Address> addressOptional = repository.findByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
+        Optional<Address> addressOptional = addressRepository.findByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
         return addressOptional.map(addressAssembler::toModel);
+    }
+
+    /**
+     * Adding new address to the city entity.
+     *
+     * @param countryId  (Required) the ID of the Country entity
+     * @param cityId     (Required) the ID of the City entity
+     * @param addressDto (Required) the AddressDto (presentation) model
+     * @return
+     */
+    @Override
+    public AddressDto addNew(Integer countryId, Integer cityId, @Valid AddressDto addressDto) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        Assert.notNull(cityId, "City id must not be null!");
+        Assert.notNull(addressDto, "Address data must not be null!");
+        //
+        Optional<City> cityOptional = cityRepository.findByIdAndCountry_Id(cityId, countryId);
+        City city = cityOptional.orElseThrow(() -> {
+            String s = String.format("City [%] does not exist in the Country [%d]", cityId, countryId);
+            return new TaskExecutionException(s);
+        });
+        Address address = mapper.addressDtoToAddress(addressDto);
+        city.add(address);
+        address = addressRepository.save(address);
+        return addressAssembler.toModel(address);
+    }
+
+    /**
+     * Updating an existing address entity.
+     *
+     * @param countryId  (Required) the ID of the Country entity
+     * @param cityId     (Required) the ID of the City entity
+     * @param addressDto (Required) the AddressDto (presentation) model
+     * @param addressId  (Required) the ID of the existing address entity to be updated
+     * @return
+     */
+    @Override
+    public AddressDto update(Integer countryId, Integer cityId, @Valid AddressDto addressDto, Integer addressId) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        Assert.notNull(cityId, "City id must not be null!");
+        Assert.notNull(addressDto, "Address data must not be null!");
+        Assert.notNull(addressId, "Address id must not be null!");
+        //
+        Optional<Address> addressOptional = addressRepository
+                .findByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
+        Address address = addressOptional.orElseThrow(() -> {
+            String s = String.format("Failed to search the address with (address id=[%d], city id=[%d] and country " +
+                            "id=[%d])", addressId, cityId, countryId);
+            return new TaskExecutionException(s);
+        });
+        // Use mapstruct to map the nonnull attributes from dto to entity.
+        mapper.updateAddressFromAddressDto(addressDto, address);
+        return addressAssembler.toModel(addressRepository.save(address));
+    }
+
+    /**
+     * Deleting an item from the root object.
+     *
+     * @param countryId (Required) the ID of the Country entity
+     * @param cityId    (Required) the ID of the City entity
+     * @param addressId (Required) the ID of the existing address entity to be deleted
+     */
+    @Override
+    public void delete(Integer countryId, Integer cityId, Integer addressId) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        Assert.notNull(cityId, "City id must not be null!");
+        Assert.notNull(cityId, "Address id must not be null!");
+        addressRepository.deleteByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
     }
 
     /**
@@ -152,7 +230,16 @@ public class AddressServiceImpl implements AddressService {
      */
     @Override
     public CollectionModel findPaginated(String whatToFind, PageRequest pageRequest) {
-        return null;
+        Assert.notNull(pageRequest, "PageRequest must not be null!");
+        Page<Address> addressesPage;
+        if (StringUtils.hasLength(whatToFind)) {
+            //find all records having "whatToFind"
+            addressesPage = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind, pageRequest);
+        } else {
+            // find all records
+            addressesPage = addressRepository.findAll(pageRequest);
+        }
+        return pagedResourcesAssembler.toModel(addressesPage, addressAssembler);
     }
 
     /**
@@ -161,8 +248,13 @@ public class AddressServiceImpl implements AddressService {
      * @return
      */
     @Override
-    public CollectionModel findAll() {
-        return null;
+    public CollectionModel<AddressDto> findAll() {
+        List<Address> addresses = addressRepository.findAll();
+        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
+        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
+                .findList(null, null, null))
+                .withSelfRel().expand());
+        return collectionModel;
     }
 
     /**
@@ -172,7 +264,13 @@ public class AddressServiceImpl implements AddressService {
      * @return
      */
     @Override
-    public CollectionModel findByText(String whatToFind) {
-        return null;
+    public CollectionModel<AddressDto> findByText(String whatToFind) {
+        List<Address> addresses = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind);
+        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
+        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
+                .findList(whatToFind, null, null))
+                .withSelfRel().expand());
+        return collectionModel;
     }
+
 }

@@ -10,7 +10,6 @@ import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -31,9 +30,9 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
      * Find and return a list of RepresentationModel.
      *
      * @param rootId (Required) The id of the root/owing object
-     * @param name    (Optional) null value indicates search all
-     * @param page    (Optional) null value indicates searching result is paginated and the page {page} is display
-     * @param size    (Optional) null value indicates searching result is paginated and the size of page is {size}
+     * @param name   (Optional) null value indicates search all
+     * @param page   (Optional) null value indicates searching result is paginated and the page {page} is display
+     * @param size   (Optional) null value indicates searching result is paginated and the size of page is {size}
      * @return
      */
     public ResponseEntity<CollectionModel<T>> findList(Integer rootId, String name, Integer page,
@@ -60,7 +59,7 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
                 collectionModel = getService().findAll(rootId);
             }
             if (collectionModel.getContent().isEmpty()) {
-               throw new DataNotFoundException();
+                throw new DataNotFoundException();
             }
             return ResponseEntity.ok(collectionModel);
         }
@@ -85,7 +84,7 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
     }
 
     public ResponseEntity<Void> update(@Min(1) Integer ownerId,
-                                       @Valid CityDto model,
+                                       @Valid T model,
                                        @Min(1) Integer childId) {
         //
         getService().update(ownerId, model, childId);

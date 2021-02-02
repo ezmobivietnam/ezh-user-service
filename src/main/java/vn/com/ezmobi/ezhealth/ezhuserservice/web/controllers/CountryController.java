@@ -21,7 +21,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 @Validated
 @RequestMapping(CountryController.BASE_URL)
 @RestController
-public class CountryController extends AbstractRootController<CountryDto> {
+public class CountryController extends AbstractRootController<CountryDto, Integer> {
 
     public static final String BASE_URL = "/api/countries";
     public static final int DEFAULT_PAGE_NUMBER = 0;

@@ -4,6 +4,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.List;
+
 /**
  * Created by ezmobivietnam on 2021-01-18.
  */
@@ -33,4 +35,5 @@ public interface SimpleService<T extends RepresentationModel<? extends T>> {
      */
     public CollectionModel<T> findByText(String whatToFind);
 
+//    public void deleteAllByIds(List<Integer> ids);
 }

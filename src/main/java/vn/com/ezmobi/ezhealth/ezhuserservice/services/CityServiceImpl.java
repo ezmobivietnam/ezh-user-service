@@ -251,4 +251,5 @@ public class CityServiceImpl implements CityService {
         Assert.notNull(cityId, "City id must not be null!");
         cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
     }
+
 }

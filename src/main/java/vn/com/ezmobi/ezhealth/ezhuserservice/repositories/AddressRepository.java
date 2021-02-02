@@ -39,4 +39,11 @@ public interface AddressRepository extends JpaRepository<Address, Integer>, JpaS
             , String findingAddress, Pageable pageRequest);
 
     Optional<Address> findByIdAndCity_IdAndCity_Country_Id(Integer addressId, Integer cityId, Integer countryId);
+
+    List<Address> findAllByAddressContainingIgnoreCase(String havingAddress);
+    Page<Address> findAllByAddressContainingIgnoreCase(String havingAddress, Pageable pageRequest);
+
+    void deleteByIdAndCity_IdAndCity_Country_Id(Integer addressId, Integer cityId, Integer countryId);
+
+//    void deleteAllByIdIn(List<Integer> ids);
 }

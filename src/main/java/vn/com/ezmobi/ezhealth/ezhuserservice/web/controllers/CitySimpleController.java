@@ -3,13 +3,12 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CityService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.SimpleService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
+
+import java.util.List;
 
 /**
  * Created by ezmobivietnam on 2021-01-18.
@@ -17,7 +16,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 @Slf4j
 @RequestMapping(CitySimpleController.BASE_URL)
 @RestController
-public class CitySimpleController extends AbstractSimpleController<CityDto> {
+public class CitySimpleController extends AbstractSimpleController<CityDto, Integer> {
     public static final String BASE_URL = "/api/cities";
 
     private final CityService cityService;
@@ -36,6 +35,12 @@ public class CitySimpleController extends AbstractSimpleController<CityDto> {
         log.debug(String.format("Finding cities with conditions: pageNumber=%d, pageSize=%d, name=%s",
                 page, size, name));
         return super.findList(name, page, size);
+    }
+
+    @Override
+    @DeleteMapping
+    public ResponseEntity<Void> delete(@RequestParam(name = "ids", required = false) List<Integer> cityIds) {
+        return super.delete(cityIds);
     }
 
     @Override

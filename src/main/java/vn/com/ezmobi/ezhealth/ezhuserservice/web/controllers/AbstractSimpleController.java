@@ -7,13 +7,14 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.SimpleService;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
  * Created by ezmobivietnam on 2021-01-19.
  */
 @Slf4j
-public abstract class AbstractSimpleController<T extends RepresentationModel<? extends T>> {
+public abstract class AbstractSimpleController<T extends RepresentationModel<? extends T>, ID> {
     public static final int DEFAULT_PAGE_NUMBER = 0;
     public static final int DEFAULT_PAGE_SIZE = 20;
 
@@ -48,6 +49,11 @@ public abstract class AbstractSimpleController<T extends RepresentationModel<? e
             }
             return ResponseEntity.ok(collectionModel);
         }
+    }
+
+    public ResponseEntity<Void> delete(List<ID> ids) {
+//        getService().deleteAllByIds(ids);
+        return ResponseEntity.noContent().build();
     }
 
     protected abstract SimpleService getService();

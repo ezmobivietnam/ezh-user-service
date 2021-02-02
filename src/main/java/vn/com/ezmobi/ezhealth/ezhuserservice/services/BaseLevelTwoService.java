@@ -4,6 +4,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,35 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @return
      */
     Optional<T> findById(Integer rootId, Integer levelOneId, Integer levelTwoId);
+
+    /**
+     * Adding new item to the level one object.
+     *
+     * @param rootId              (Required) the ID of the root object
+     * @param levelOneId          (Required) the ID of the level one object
+     * @param representationModel (Required) the presentation model
+     * @return
+     */
+    T addNew(Integer rootId, Integer levelOneId, @Valid T representationModel);
+
+    /**
+     * Updating an existing item belong to the root object.
+     *
+     * @param rootId              (Required) the root ID
+     * @param levelOneId          (Required) the ID of the level one object
+     * @param representationModel (Required) the presentation model to be updated
+     * @param levelTwoId          (Required) the id of the level two item to be updated
+     * @return
+     */
+    T update(Integer rootId, Integer levelOneId, @Valid T representationModel, Integer levelTwoId);
+
+    /**
+     * Deleting an item from the root object.
+     *
+     * @param rootId     (Required) the root ID which contains the level one object
+     * @param levelOneId (Required) the ID of the level one object which contains the level two object
+     * @param levelTwoId (Required) the id of the level two item to be deleted
+     */
+    void delete(Integer rootId, Integer levelOneId, Integer levelTwoId);
 
 }

@@ -3,13 +3,16 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +77,22 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
         }));
     }
 
+    public ResponseEntity<Void> addNew(@Min(1) Integer rootId, @Min(1) Integer levelOneId, @Valid T model) {
+        RepresentationModel newModel = getService().addNew(rootId, levelOneId, model);
+        return ResponseEntity.created(newModel.getRequiredLink(IanaLinkRelations.SELF_VALUE).toUri()).build();
+    }
+
+    public ResponseEntity<Void> update(@Min(1) Integer countryId, @Min(1) Integer cityId, @Valid T model,
+                                       @Min(1) Integer addressId) {
+        //
+        getService().update(countryId, cityId, model, addressId);
+        return ResponseEntity.ok().build();
+    }
+
+    public ResponseEntity<Void> delete(@Min(1) Integer rootId, @Min(1) Integer levelOneId, @Min(1) Integer levelTwoId) {
+        getService().delete(rootId, levelOneId, levelTwoId);
+        return ResponseEntity.noContent().build();
+    }
 
     protected abstract BaseLevelTwoService getService();
 }
