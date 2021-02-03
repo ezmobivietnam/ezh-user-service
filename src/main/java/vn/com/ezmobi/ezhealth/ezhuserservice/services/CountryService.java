@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * Created by ezmobivietnam on 2021-01-04.
  */
-public interface CountryService extends BaseRootService<CountryDto> {
+public interface CountryService extends BaseRootService<CountryDto, Integer> {
 
 //    CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest);
 //    CollectionModel<CountryDto> findAll();

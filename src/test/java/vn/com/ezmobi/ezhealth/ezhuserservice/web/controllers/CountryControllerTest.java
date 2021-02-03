@@ -111,9 +111,10 @@ class CountryControllerTest extends BaseControllerTest {
     void findList_givenEmptyResult_thenReceiveOKStatusWithNoData() throws Exception {
         // given
         String findAllUrl = CountryController.BASE_URL;
-        given(countryService.findAll()).willReturn(CollectionModel.empty()
-                .add(linkTo(methodOn(CountryController.class).findList(null, null, null))
-                        .withSelfRel().expand()));
+        CollectionModel<CountryDto> emptyCollectionModel = CollectionModel.empty();
+        emptyCollectionModel.add(linkTo(methodOn(CountryController.class).findList(null, null, null))
+                .withSelfRel().expand());
+        given(countryService.findAll()).willReturn(emptyCollectionModel);
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))

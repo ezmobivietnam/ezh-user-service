@@ -252,4 +252,9 @@ public class CityServiceImpl implements CityService {
         cityRepository.deleteByIdAndCountry_Id(cityId, countryId);
     }
 
+    @Override
+    public void deleteAllByIds(List<Integer> cityIds) {
+        Assert.notEmpty(cityIds, "List of IDs must not be null or empty");
+        cityRepository.deleteAllByIdIn(cityIds);
+    }
 }

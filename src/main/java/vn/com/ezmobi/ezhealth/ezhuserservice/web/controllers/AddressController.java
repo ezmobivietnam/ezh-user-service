@@ -10,7 +10,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 
 /**
@@ -20,7 +19,7 @@ import java.util.List;
 @Validated
 @RequestMapping(AddressController.BASE_URL)
 @RestController
-public class AddressController extends AbstractLevelTwoController<AddressDto> {
+public class AddressController extends AbstractLevelTwoController<AddressDto, Integer> {
 
     public static final String BASE_URL = "/api/countries/{countryId}/cities/{cityId}/addresses";
 
@@ -56,35 +55,35 @@ public class AddressController extends AbstractLevelTwoController<AddressDto> {
     @Override
     @GetMapping("/{addressId}")
     public ResponseEntity<AddressDto> findById(
-            @PathVariable @Min(1) Integer countryId,
-            @PathVariable @Min(1) Integer cityId,
-            @PathVariable @Min(1) Integer addressId) {
+            @PathVariable Integer countryId,
+            @PathVariable Integer cityId,
+            @PathVariable Integer addressId) {
 
         return super.findById(countryId, cityId, addressId);
     }
 
     @Override
     @PostMapping
-    public ResponseEntity<Void> addNew(@PathVariable @Min(1) Integer countryId,
-                                       @PathVariable @Min(1) Integer cityId,
+    public ResponseEntity<Void> addNew(@PathVariable Integer countryId,
+                                       @PathVariable Integer cityId,
                                        @RequestBody @Valid AddressDto model) {
         return super.addNew(countryId, cityId, model);
     }
 
     @Override
     @PutMapping("/{addressId}")
-    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer countryId,
-                                       @PathVariable @Min(1) Integer cityId,
+    public ResponseEntity<Void> update(@PathVariable Integer countryId,
+                                       @PathVariable Integer cityId,
                                        @RequestBody @Valid AddressDto model,
-                                       @PathVariable @Min(1) Integer addressId) {
+                                       @PathVariable Integer addressId) {
         return super.update(countryId, cityId, model, addressId);
     }
 
     @Override
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer countryId,
-                                       @PathVariable @Min(1) Integer cityId,
-                                       @PathVariable @Min(1) Integer addressId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer countryId,
+                                       @PathVariable Integer cityId,
+                                       @PathVariable Integer addressId) {
         return super.delete(countryId, cityId, addressId);
     }
 

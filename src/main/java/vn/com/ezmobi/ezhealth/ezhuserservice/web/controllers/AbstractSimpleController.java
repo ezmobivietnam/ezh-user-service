@@ -52,7 +52,7 @@ public abstract class AbstractSimpleController<T extends RepresentationModel<? e
     }
 
     public ResponseEntity<Void> delete(List<ID> ids) {
-//        getService().deleteAllByIds(ids);
+        getService().deleteAllByIds(ids);
         return ResponseEntity.noContent().build();
     }
 

@@ -23,7 +23,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Validated
-public abstract class AbstractLevelTwoController<T extends RepresentationModel<? extends T>> {
+public abstract class AbstractLevelTwoController<T extends RepresentationModel<? extends T>, ID> {
 
     public static final int DEFAULT_PAGE_NUMBER = 0;
     public static final int DEFAULT_PAGE_SIZE = 20;
@@ -39,9 +39,9 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
      * @param size            (Optional) null value indicates searching result is paginated and the size of page is {size}
      * @return
      */
-    public ResponseEntity<CollectionModel<T>> findList(Integer rootId,
-                                                       Integer levelOneId,
-                                                       List<Integer> withLevelTwoIds,
+    public ResponseEntity<CollectionModel<T>> findList(ID rootId,
+                                                       ID levelOneId,
+                                                       List<ID> withLevelTwoIds,
                                                        String withText,
                                                        Integer page,
                                                        Integer size) {
@@ -68,7 +68,7 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
         }
     }
 
-    public ResponseEntity<T> findById(@Min(1) Integer rootId, @Min(1) Integer levelOneId, @Min(1) Integer levelTwoId) {
+    public ResponseEntity<T> findById(ID rootId, ID levelOneId, ID levelTwoId) {
         Optional<T> model = getService().findById(rootId, levelOneId, levelTwoId);
         return ResponseEntity.ok(model.orElseThrow(() -> {
             String s = String.format("Failed to search data with root id=%s, level one id=%s, level two id=", rootId,
@@ -77,19 +77,18 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
         }));
     }
 
-    public ResponseEntity<Void> addNew(@Min(1) Integer rootId, @Min(1) Integer levelOneId, @Valid T model) {
+    public ResponseEntity<Void> addNew(ID rootId, ID levelOneId, @Valid T model) {
         RepresentationModel newModel = getService().addNew(rootId, levelOneId, model);
         return ResponseEntity.created(newModel.getRequiredLink(IanaLinkRelations.SELF_VALUE).toUri()).build();
     }
 
-    public ResponseEntity<Void> update(@Min(1) Integer countryId, @Min(1) Integer cityId, @Valid T model,
-                                       @Min(1) Integer addressId) {
+    public ResponseEntity<Void> update(ID countryId, ID cityId, @Valid T model, ID addressId) {
         //
         getService().update(countryId, cityId, model, addressId);
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<Void> delete(@Min(1) Integer rootId, @Min(1) Integer levelOneId, @Min(1) Integer levelTwoId) {
+    public ResponseEntity<Void> delete(ID rootId, ID levelOneId, ID levelTwoId) {
         getService().delete(rootId, levelOneId, levelTwoId);
         return ResponseEntity.noContent().build();
     }

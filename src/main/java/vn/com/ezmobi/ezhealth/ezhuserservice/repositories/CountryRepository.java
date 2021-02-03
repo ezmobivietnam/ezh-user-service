@@ -14,4 +14,6 @@ public interface CountryRepository
     Page<Country> findByNameContainingIgnoreCase(String pattern, Pageable pageRequest);
 
     List<Country> findByNameContainingIgnoreCase(String pattern);
+
+    void deleteAllByIdIn(List<Integer> ids);
 }

@@ -45,7 +45,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
     }
 
     @GetMapping("/{countryId}")
-    public ResponseEntity<CountryDto> findById(@PathVariable @Min(1) Integer countryId) {
+    public ResponseEntity<CountryDto> findById(@PathVariable Integer countryId) {
         log.debug("Start finding country (" + countryId + ")");
         return super.findById(countryId);
     }
@@ -60,14 +60,14 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
     @Override
     @PutMapping("/{countryId}")
     public ResponseEntity<Void> update(@RequestBody @Valid CountryDto country,
-                                             @PathVariable @Min(1) Integer countryId) {
+                                             @PathVariable Integer countryId) {
         log.debug(String.format("Start updating country with id: %d with new data: %s", countryId, country));
         return super.update(country, countryId);
     }
 
     @Override
     @DeleteMapping("/{countryId}")
-    public ResponseEntity<Void> delete(@PathVariable @Min(1) Integer countryId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer countryId) {
         log.debug(String.format("Start deleting country with id [%d]", countryId));
         return super.delete(countryId);
     }

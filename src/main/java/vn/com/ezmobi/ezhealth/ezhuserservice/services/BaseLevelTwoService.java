@@ -11,7 +11,7 @@ import java.util.Optional;
 /**
  * Created by ezmobivietnam on 2021-01-29.
  */
-public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>> extends SimpleService {
+public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>, ID> extends SimpleService<T, ID> {
 
     /**
      * Finding data with pagination.
@@ -23,7 +23,7 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param pageRequest        (Required) the page request
      * @return
      */
-    CollectionModel<T> findPaginated(Integer rootId, Integer levelOneId, List<Integer> withLevelTwoIdList,
+    CollectionModel<T> findPaginated(ID rootId, ID levelOneId, List<ID> withLevelTwoIdList,
                                      String withText, PageRequest pageRequest);
 
     /**
@@ -35,7 +35,7 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param withText           (Optional) filtering the result with given text
      * @return
      */
-    CollectionModel<T> findAll(Integer rootId, Integer levelOneId, List<Integer> withLevelTwoIdList, String withText);
+    CollectionModel<T> findAll(ID rootId, ID levelOneId, List<ID> withLevelTwoIdList, String withText);
 
     /**
      * Find a item at level two belong to the level one item and the root item
@@ -45,7 +45,7 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param levelTwoId (Required) the ID of the level two object
      * @return
      */
-    Optional<T> findById(Integer rootId, Integer levelOneId, Integer levelTwoId);
+    Optional<T> findById(ID rootId, ID levelOneId, ID levelTwoId);
 
     /**
      * Adding new item to the level one object.
@@ -55,7 +55,7 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param representationModel (Required) the presentation model
      * @return
      */
-    T addNew(Integer rootId, Integer levelOneId, @Valid T representationModel);
+    T addNew(ID rootId, ID levelOneId, @Valid T representationModel);
 
     /**
      * Updating an existing item belong to the root object.
@@ -66,7 +66,7 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param levelTwoId          (Required) the id of the level two item to be updated
      * @return
      */
-    T update(Integer rootId, Integer levelOneId, @Valid T representationModel, Integer levelTwoId);
+    T update(ID rootId, ID levelOneId, @Valid T representationModel, ID levelTwoId);
 
     /**
      * Deleting an item from the root object.
@@ -75,6 +75,6 @@ public interface BaseLevelTwoService<T extends RepresentationModel<? extends T>>
      * @param levelOneId (Required) the ID of the level one object which contains the level two object
      * @param levelTwoId (Required) the id of the level two item to be deleted
      */
-    void delete(Integer rootId, Integer levelOneId, Integer levelTwoId);
+    void delete(ID rootId, ID levelOneId, ID levelTwoId);
 
 }

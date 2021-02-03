@@ -10,13 +10,13 @@ import java.util.Optional;
  * Created by ezmobivietnam on 2021-01-15.
  */
 @Validated
-public interface BaseRootService<T extends RepresentationModel<? extends T>> extends SimpleService {
+public interface BaseRootService<T extends RepresentationModel<? extends T>, ID> extends SimpleService<T, ID> {
 
-    Optional<T> findById(Integer id);
+    Optional<T> findById(ID id);
 
     T addNew(@Valid T representationModel);
 
-    T update(@Valid T representationModel, Integer id);
+    T update(@Valid T representationModel, ID id);
 
-    void delete(Integer id);
+    void delete(ID id);
 }

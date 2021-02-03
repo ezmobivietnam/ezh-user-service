@@ -12,17 +12,17 @@ import java.util.Optional;
  * Created by ezmobivietnam on 2021-01-16.
  */
 @Validated
-public interface BaseLevelOneService<T extends RepresentationModel<? extends T>> extends SimpleService {
+public interface BaseLevelOneService<T extends RepresentationModel<? extends T>, ID> extends SimpleService<T, ID> {
 
     /**
      * Finding data with pagination belong to the root object by rootId.
      *
-     * @param rootId      (Required) the root ID
-     * @param nameExp     (Optional) the searching item name
-     * @param pageRequest (Required) the page request
+     * @param rootId           (Required) the root ID
+     * @param withFilterString (Optional) the string used to filter the searching result
+     * @param pageRequest      (Required) the page request
      * @return
      */
-    CollectionModel<T> findPaginated(Integer rootId, String nameExp, PageRequest pageRequest);
+    CollectionModel<T> findPaginated(ID rootId, String withFilterString, PageRequest pageRequest);
 
     /**
      * Finding all data (without pagination) belong to the root object by rootId.
@@ -30,7 +30,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param rootId (Required) the root ID
      * @return
      */
-    CollectionModel<T> findAll(Integer rootId);
+    CollectionModel<T> findAll(ID rootId);
 
     /**
      * Finding an item with id is levelOneId which belong to the root/owner id is rootId.
@@ -39,25 +39,25 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param levelOneId (Required) the id of the item to be found
      * @return
      */
-    Optional<T> findById(Integer rootId, Integer levelOneId);
+    Optional<T> findById(ID rootId, ID levelOneId);
 
     /**
      * Finding items belong to a root object by name.
      *
-     * @param rootId (Required) the root ID
-     * @param name   (Required) the name of the item to be found
+     * @param rootId           (Required) the root ID
+     * @param withFilterString (Required) the string used to filter the searching result
      * @return
      */
-    CollectionModel<T> findByText(Integer rootId, String name);
+    CollectionModel<T> findByText(ID rootId, String withFilterString);
 
     /**
      * Adding new items to the root object.
      *
-     * @param rootId
-     * @param representationModel
+     * @param rootId              (Required) the root ID
+     * @param representationModel (Required) the data to be added
      * @return
      */
-    T addNew(Integer rootId, @Valid T representationModel);
+    T addNew(ID rootId, @Valid T representationModel);
 
     /**
      * Updating an existing item belong to the root object.
@@ -67,7 +67,7 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param levelOneId          (Required) the id of the item to be updated
      * @return
      */
-    T update(Integer rootId, @Valid T representationModel, Integer levelOneId);
+    T update(ID rootId, @Valid T representationModel, ID levelOneId);
 
     /**
      * Deleting an item from the root object.
@@ -75,5 +75,5 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>>
      * @param rootId     (Required) the root ID
      * @param levelOneId (Required) the id of the item to be deleted
      */
-    void delete(Integer rootId, Integer levelOneId);
+    void delete(ID rootId, ID levelOneId);
 }

@@ -9,16 +9,16 @@ import java.util.List;
 /**
  * Created by ezmobivietnam on 2021-01-18.
  */
-public interface SimpleService<T extends RepresentationModel<? extends T>> {
+public interface SimpleService<T extends RepresentationModel<? extends T>, ID> {
 
     /**
      * Finding data with pagination .
      *
-     * @param whatToFind  (Optional) null value indicates find all otherwise finding by a specific criteria.
-     * @param pageRequest (Required) the page request
+     * @param withFilterString (Optional) the string used to filter the searching result
+     * @param pageRequest      (Required) the page request
      * @return
      */
-    public CollectionModel<T> findPaginated(String whatToFind, PageRequest pageRequest);
+    public CollectionModel<T> findPaginated(String withFilterString, PageRequest pageRequest);
 
     /**
      * Find all data from database. The result is not paginated.
@@ -30,10 +30,10 @@ public interface SimpleService<T extends RepresentationModel<? extends T>> {
     /**
      * Find in a specific column of a table for a specific value for example name, address...
      *
-     * @param whatToFind something to be found
+     * @param withFilterString (Required) the string used to filter the searching result
      * @return
      */
-    public CollectionModel<T> findByText(String whatToFind);
+    public CollectionModel<T> findByText(String withFilterString);
 
-//    public void deleteAllByIds(List<Integer> ids);
+    public void deleteAllByIds(List<ID> ids);
 }

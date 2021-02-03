@@ -132,4 +132,9 @@ public class CountryServiceImpl implements CountryService {
         countryRepository.deleteById(countryId);
     }
 
+    @Override
+    public void deleteAllByIds(List<Integer> countryIds) {
+        Assert.notEmpty(countryIds, "List of IDs must not be null or empty");
+        countryRepository.deleteAllByIdIn(countryIds);
+    }
 }

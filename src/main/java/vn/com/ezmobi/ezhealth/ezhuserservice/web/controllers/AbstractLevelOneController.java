@@ -12,7 +12,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,7 +20,7 @@ import java.util.Optional;
  */
 @Slf4j
 @Validated
-public abstract class AbstractLevelOneController<T extends RepresentationModel<? extends T>> {
+public abstract class AbstractLevelOneController<T extends RepresentationModel<? extends T>, ID> {
 
     public static final int DEFAULT_PAGE_NUMBER = 0;
     public static final int DEFAULT_PAGE_SIZE = 20;
@@ -35,7 +34,7 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
      * @param size   (Optional) null value indicates searching result is paginated and the size of page is {size}
      * @return
      */
-    public ResponseEntity<CollectionModel<T>> findList(Integer rootId, String name, Integer page,
+    public ResponseEntity<CollectionModel<T>> findList(ID rootId, String name, Integer page,
                                                        Integer size) {
         Assert.notNull(rootId, "Root id must not be null!");
 
@@ -65,7 +64,7 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
         }
     }
 
-    public ResponseEntity<T> findById(@Min(1) Integer ownerId, @Min(1) Integer childId) {
+    public ResponseEntity<T> findById(ID ownerId, ID childId) {
         Optional<T> model = getService().findById(ownerId, childId);
         return ResponseEntity.ok(model.orElseThrow(() -> {
             String s = String.format("Failed to search data with root id=%s, level one id=%s", ownerId, childId);
@@ -73,19 +72,17 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
         }));
     }
 
-    public ResponseEntity<Void> delete(@Min(1) Integer ownerId, @Min(1) Integer childId) {
+    public ResponseEntity<Void> delete(ID ownerId, ID childId) {
         getService().delete(ownerId, childId);
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<Void> addNew(@Min(1) Integer ownerId, @Valid T model) {
+    public ResponseEntity<Void> addNew(ID ownerId, @Valid T model) {
         RepresentationModel newModel = getService().addNew(ownerId, model);
         return ResponseEntity.created(newModel.getRequiredLink(IanaLinkRelations.SELF_VALUE).toUri()).build();
     }
 
-    public ResponseEntity<Void> update(@Min(1) Integer ownerId,
-                                       @Valid T model,
-                                       @Min(1) Integer childId) {
+    public ResponseEntity<Void> update(ID ownerId, @Valid T model, ID childId) {
         //
         getService().update(ownerId, model, childId);
         return ResponseEntity.ok().build();

@@ -273,4 +273,9 @@ public class AddressServiceImpl implements AddressService {
         return collectionModel;
     }
 
+    @Override
+    public void deleteAllByIds(List<Integer> addressIds) {
+        Assert.notEmpty(addressIds, "List of IDs must not be null or empty");
+        addressRepository.deleteAllByIdIn(addressIds);
+    }
 }

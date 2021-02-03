@@ -10,7 +10,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.CityService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 
 /**
  * Ref:
@@ -23,7 +22,7 @@ import javax.validation.constraints.Min;
 @Validated
 @RequestMapping(CityController.BASE_URL)
 @RestController
-public class CityController extends AbstractLevelOneController<CityDto> {
+public class CityController extends AbstractLevelOneController<CityDto, Integer> {
 
     public static final String BASE_URL = "/api/countries/{countryId}/cities";
 
@@ -59,25 +58,23 @@ public class CityController extends AbstractLevelOneController<CityDto> {
 
     @Override
     @GetMapping("/{cityId}")
-    public ResponseEntity<CityDto> findById(@PathVariable @Min(1) Integer countryId,
-                                            @PathVariable @Min(1) Integer cityId) {
+    public ResponseEntity<CityDto> findById(@PathVariable Integer countryId,
+                                            @PathVariable Integer cityId) {
         log.debug(String.format("Country id=%s, city id=%s", countryId, cityId));
         return super.findById(countryId, cityId);
     }
 
     @Override
     @PostMapping()
-    public ResponseEntity<Void> addNew(
-            @PathVariable @Min(1) Integer countryId,
-            @RequestBody @Valid CityDto model) {
+    public ResponseEntity<Void> addNew(@PathVariable Integer countryId, @RequestBody @Valid CityDto model) {
         log.debug(String.format("Adding to the country [%d] the new city [%s]", countryId, model));
         return super.addNew(countryId, model);
     }
 
     @PutMapping("/{cityId}")
-    public ResponseEntity<Void> update(@PathVariable @Min(1) Integer countryId,
+    public ResponseEntity<Void> update(@PathVariable Integer countryId,
                                        @RequestBody @Valid CityDto model,
-                                       @PathVariable @Min(1) Integer cityId) {
+                                       @PathVariable Integer cityId) {
         log.debug(String.format("Updating city info with country id=[%d], new city data=[%s], city id=[%d]",
                 countryId, model, cityId));
         return super.update(countryId, model, cityId);
@@ -85,9 +82,7 @@ public class CityController extends AbstractLevelOneController<CityDto> {
 
     @Override
     @DeleteMapping("/{cityId}")
-    public ResponseEntity<Void> delete(
-            @PathVariable @Min(1) Integer countryId,
-            @PathVariable @Min(1) Integer cityId) {
+    public ResponseEntity<Void> delete(@PathVariable Integer countryId, @PathVariable Integer cityId) {
         return super.delete(countryId, cityId);
     }
 

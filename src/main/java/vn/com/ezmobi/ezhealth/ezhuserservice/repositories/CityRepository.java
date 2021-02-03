@@ -29,4 +29,5 @@ public interface CityRepository extends JpaRepository<City, Integer>, JpaSpecifi
 
     void  deleteByIdAndCountry_Id(Integer cityId, Integer countryId);
 
+    void deleteAllByIdIn(List<Integer> ids);
 }

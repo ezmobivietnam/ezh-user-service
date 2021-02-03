@@ -8,7 +8,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseRootService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.Optional;
 
 /**
@@ -36,17 +35,17 @@ public abstract class AbstractRootController<T extends RepresentationModel<? ext
      * @param id
      * @return ResponseEntity.ok()
      */
-    public ResponseEntity<Void> update(@Valid T model, @Min(1) Integer id) {
+    public ResponseEntity<Void> update(@Valid T model, ID id) {
         getService().update(model, id);
         return ResponseEntity.ok().build();
     }
 
-    public ResponseEntity<T> findById(@Min(1) Integer id) {
+    public ResponseEntity<T> findById(ID id) {
         Optional<T> model = getService().findById(id);
         return ResponseEntity.ok().body(model.orElseThrow(DataNotFoundException::new));
     }
 
-    public ResponseEntity<Void> delete(@Min(1) Integer id) {
+    public ResponseEntity<Void> delete(ID id) {
         getService().delete(id);
         return ResponseEntity.noContent().build();
     }
