@@ -4,6 +4,8 @@ import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -25,6 +27,8 @@ public class Country implements Serializable {
     private int id;
 
     @Column(name = "country", nullable = false)
+    @NotNull
+    @Size(min = 1, max = 50)
     private String name;
 
     @Column(name = "last_update", nullable = false)

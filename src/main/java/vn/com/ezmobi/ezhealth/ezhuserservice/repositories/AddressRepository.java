@@ -40,10 +40,20 @@ public interface AddressRepository extends JpaRepository<Address, Integer>, JpaS
 
     Optional<Address> findByIdAndCity_IdAndCity_Country_Id(Integer addressId, Integer cityId, Integer countryId);
 
+    void deleteByIdAndCity_IdAndCity_Country_Id(Integer addressId, Integer cityId, Integer countryId);
+
+    //=================================================================================================================
+    // JPA APIs for SimpleService
+    //=================================================================================================================
+    List<Address> findAllByIdInAndAddressContainingIgnoreCase(List<Integer> addressIds, String containingAddress);
+    Page<Address> findAllByIdInAndAddressContainingIgnoreCase(List<Integer> addressIds, String containingAddress,
+                                                              Pageable pageRequest);
+
+    List<Address> findAllByIdIn(List<Integer> addressIds);
+    Page<Address> findAllByIdIn(List<Integer> addressIds, Pageable pageRequest);
+
     List<Address> findAllByAddressContainingIgnoreCase(String havingAddress);
     Page<Address> findAllByAddressContainingIgnoreCase(String havingAddress, Pageable pageRequest);
-
-    void deleteByIdAndCity_IdAndCity_Country_Id(Integer addressId, Integer cityId, Integer countryId);
 
     void deleteAllByIdIn(List<Integer> ids);
 }

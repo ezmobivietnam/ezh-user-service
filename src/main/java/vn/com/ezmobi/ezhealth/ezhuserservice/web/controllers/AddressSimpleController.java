@@ -30,18 +30,20 @@ public class AddressSimpleController extends AbstractSimpleController<AddressDto
     /**
      * Find and return a list of data.
      *
-     * @param withAddress (Optional) not null value will be used to search data by name.
-     * @param page        (Optional) the page number start from 0. Not null value will be used to config pagination.
-     * @param size        (Optional) the size (number of items) in each page. Not null value will be used to config pagination.
+     * @param withIds  (Optional) filtering the result by the address's ids
+     * @param withText (Optional) filtering the result by the given text
+     * @param page     (Optional) the page number start from 0. Not null value will be used to config pagination.
+     * @param size     (Optional) the size (number of items) in each page. Not null value will be used to config pagination.
      * @return
      */
     @Override
     @GetMapping
     public ResponseEntity<CollectionModel<AddressDto>> findList(
-            @RequestParam(name = "withAddress", required = false) String withAddress,
+            @RequestParam(name = "ids", required = false) List<Integer> withIds,
+            @RequestParam(name = "withText", required = false) String withText,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {
-        return super.findList(withAddress, page, size);
+        return super.findList(withIds, withText, page, size);
     }
 
     @Override

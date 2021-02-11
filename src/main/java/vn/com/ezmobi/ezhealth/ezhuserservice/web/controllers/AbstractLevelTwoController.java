@@ -34,7 +34,7 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
      * @param rootId          (Required) The id of the root object
      * @param levelOneId      (Required) The id of the root object
      * @param withLevelTwoIds (Optional) filtering the result by the level two id
-     * @param withText        (Optional) filtering the result with searching text. Null value indicates search all
+     * @param withText        (Optional) filtering the result with the given text.
      * @param page            (Optional) null value indicates searching result is paginated and the page {page} is display
      * @param size            (Optional) null value indicates searching result is paginated and the size of page is {size}
      * @return

@@ -14,20 +14,23 @@ public interface CityRepository extends JpaRepository<City, Integer>, JpaSpecifi
     Page<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String cityName,
                                                                      Integer countryId,
                                                                      Pageable pageRequest);
-
     List<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String name, Integer countryId);
 
-    Page<City> findAllByNameContainingIgnoreCase(String name, Pageable pageRequest);
-
-    List<City> findAllByNameContainingIgnoreCase(String name);
-
     Page<City> findAllByCountry_Id(Integer countryId, Pageable pageRequest);
-
     List<City> findAllByCountry_Id(Integer countryId);
 
     Optional<City> findByIdAndCountry_Id(Integer cityId, Integer countryId);
 
     void  deleteByIdAndCountry_Id(Integer cityId, Integer countryId);
+
+    Page<City> findAllByIdInAndNameContainingIgnoreCase(List<Integer> withCityIds, String withName, Pageable pageRequest);
+    List<City> findAllByIdInAndNameContainingIgnoreCase(List<Integer> withCityIds, String withName);
+
+    Page<City> findAllByIdIn(List<Integer> withCityIds, Pageable pageRequest);
+    List<City> findAllByIdIn(List<Integer> withCityIds);
+
+    Page<City> findAllByNameContainingIgnoreCase(String name, Pageable pageRequest);
+    List<City> findAllByNameContainingIgnoreCase(String name);
 
     void deleteAllByIdIn(List<Integer> ids);
 }

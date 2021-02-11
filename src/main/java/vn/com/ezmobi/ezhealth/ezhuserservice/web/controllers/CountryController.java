@@ -10,9 +10,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import java.util.List;
 
 /**
  * Created by ezmobivietnam on 2021-01-04.
@@ -33,15 +31,25 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
         this.countryService = countryService;
     }
 
+    /**
+     * Find and return a list of data.
+     *
+     * @param withIds  (Optional) filtering the result by the entity's ids
+     * @param withText (Optional) filtering the result by the given text
+     * @param page     (Optional) the page number start from 0. Not null value will be used to config pagination.
+     * @param size     (Optional) the size (number of items) in each page. Not null value will be used to config pagination.
+     * @return
+     */
+    @Override
     @GetMapping()
     public ResponseEntity<CollectionModel<CountryDto>> findList(
-            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "ids", required = false) List<Integer> withIds,
+            @RequestParam(name = "name", required = false) String withText,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {
-
-        log.debug(String.format("Finding country with conditions: pageNumber=%d, pageSize=%d, name=%s", page,
-                size, name));
-        return super.findList(name, page, size);
+        log.debug(String.format("Finding country with conditions: ids=[%s], name=[%s], pageNumber=[%d], " +
+                "pageSize=[%d]", withIds, withText, page, size));
+        return super.findList(withIds, withText, page, size);
     }
 
     @GetMapping("/{countryId}")
@@ -54,13 +62,13 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
     @PostMapping()
     public ResponseEntity<Void> addNew(@Valid @RequestBody CountryDto country) {
         log.debug("Starting adding new country:", country);
-       return super.addNew(country);
+        return super.addNew(country);
     }
 
     @Override
     @PutMapping("/{countryId}")
     public ResponseEntity<Void> update(@RequestBody @Valid CountryDto country,
-                                             @PathVariable Integer countryId) {
+                                       @PathVariable Integer countryId) {
         log.debug(String.format("Start updating country with id: %d with new data: %s", countryId, country));
         return super.update(country, countryId);
     }

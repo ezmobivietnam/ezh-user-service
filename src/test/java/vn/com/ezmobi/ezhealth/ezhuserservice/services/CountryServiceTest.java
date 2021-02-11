@@ -59,9 +59,11 @@ class CountryServiceTest {
 
     /**
      * Given:
-     * 1. Searching name is not null (find all countries by name)
-     * 2. PageRequest is not null (page number =0 and page size = 2)
-     * 3. The method countryRepository.findByNameContainingIgnoreCase() return a collection of only ONE item
+     * 1. Searching Ids is null
+     * 2. Searching name is not null (find all countries by name)
+     * 3. PageRequest is not null (page number =0 and page size = 2)
+     * 4. The method countryRepository.findAllByNameContainingIgnoreCase(String, Pageable) return a collection of only
+     * ONE item
      * <p>
      * Then expect:
      * 1. List of countries match the searching name is returned.
@@ -103,11 +105,11 @@ class CountryServiceTest {
          */
         //given
         PageImpl<Country> countryPage = new PageImpl(List.of(vietnam));
-        given(countryRepository.findByNameContainingIgnoreCase(anyString(), any(PageRequest.class)))
+        given(countryRepository.findAllByNameContainingIgnoreCase(anyString(), any(PageRequest.class)))
                 .willReturn(countryPage);
         //when
         CollectionModel<CountryDto> collectionModelList = countryService
-                .findPaginated("Viet", PageRequest.of(0, 2));
+                .findPaginated(null, "Viet", PageRequest.of(0, 2));
         //then
         assertEquals(1, collectionModelList.getContent().size());
         assertEquals(1, collectionModelList.getLinks().stream().count());
@@ -116,19 +118,20 @@ class CountryServiceTest {
 
     /**
      * Given:
-     * 1. Searching name is null (find all)
+     * 1. Searching Ids is null
+     * 2. Searching name is null
      * 2. PageRequest is not null (page number =0 and page size = 2)
-     * 3. The method countryRepository.findAll(Pageable pageable) return a collection of 02 of 03 items (fixed into 02
-     * pages)
+     * 3. The method countryRepository.findAll(Pageable pageable) return a collection of 02 of 03 items (the first
+     * one of two pages)
      * <p>
      * Then expect:
      * 1. The collection of countries corresponding to the PageRequest is returned
      * 2. Links (first, self, next, last) are added to the response
      * <p>
-     * Target method: CountryService.findPaginated(String whatToFind, PageRequest pageRequest)
+     * Target method: CountryService.findPaginated(List<Integer> withIds, String withName, PageRequest pageRequest)
      */
     @Test
-    void findPaginated_givenSearchingNameNullAndDataFixedIntoMultiPages_thenFirstPageReturnedWithPaginationLinks() {
+    void findPaginated_givenSearchingParamsNullAndDataFixedIntoMultiPages_thenFirstPageReturnedWithPaginationLinks() {
         /**
          * Sample json format responded by findPaginated():
          * {
@@ -183,7 +186,7 @@ class CountryServiceTest {
         Page<Country> stubData = new PageImpl<>(firstPageEntities, pageRequest, allEntities.size());
         given(countryRepository.findAll(any(PageRequest.class))).willReturn(stubData);
         //when
-        CollectionModel<CountryDto> paginationModel = countryService.findPaginated(null, pageRequest);
+        CollectionModel<CountryDto> paginationModel = countryService.findPaginated(null, null, pageRequest);
         PagedModel<City> pagedModel = (PagedModel) paginationModel;
         //then expect
         assertNotNull(pagedModel.getMetadata());
@@ -198,7 +201,9 @@ class CountryServiceTest {
 
     /**
      * Given:
-     * 1. The method CountryRepository.findAll() return a list of 03 countries.
+     * 1. The searching ids is null
+     * 2. The searching name is null
+     * 3. The method CountryRepository.findAll() return a list of 03 countries.
      * <p>
      * Then expect:
      * 1. The collection of 03 CountryDto objects is returned.
@@ -246,11 +251,60 @@ class CountryServiceTest {
         List<Country> countryEntities = List.of(cambodia, vietnam, laos);
         given(countryRepository.findAll()).willReturn(countryEntities);
         //when
-        CollectionModel<CountryDto> countryDtoList = countryService.findAll();
+        CollectionModel<CountryDto> countryDtoList = countryService.findAll(null, null);
         //then
         assertNotNull(countryDtoList);
         assertEquals(countryEntities.size(), countryDtoList.getContent().size());
         assertNotNull(countryDtoList.getLink(IanaLinkRelations.SELF_VALUE).get());
+    }
+
+
+    /**
+     * Given:
+     * 1. Searching ids is null
+     * 2. Searching name is not null and not empty
+     * 3. The method CountryRepository.findByNameContainingIgnoreCase(nameExp) return ONE country matches the
+     * searching condition
+     * <p>
+     * Then expect:
+     * 1. The collection containing ONE CountryDto object is return.
+     * 2. A "self" link is appended to the result.
+     * <p>
+     * Target method: CountryService.findAll(List<Integer> withIds, String withName)
+     */
+    @Test
+    void findAll_givenIdsNullAndNameNotNullAndFoundOneCountryMatches_thenReturnListOfOneCountryWithSelfLink() {
+        /**
+         * Sample json format responded by findByName():
+         * {
+         *     "_embedded": {
+         *         "countryDtoList": [
+         *             {
+         *                 "id": 105,
+         *                 "name": "Vietnam",
+         *                 "_links": {
+         *                     "self": {
+         *                         "href": "http://localhost:8080/api/countries/105"
+         *                     }
+         *                 }
+         *             }
+         *         ]
+         *     },
+         *     "_links": {
+         *         "self": {
+         *             "href": "http://localhost:8080/api/countries?name=Viet"
+         *         }
+         *     }
+         * }
+         */
+        //given
+        given(countryRepository.findAllByNameContainingIgnoreCase(anyString())).willReturn(List.of(vietnam));
+        //when
+        CollectionModel<CountryDto> result = countryService.findAll(null, "Viet");
+        //then
+        assertNotNull(result);
+        assertEquals(1, result.getContent().size());
+        assertNotNull(result.getLink(IanaLinkRelations.SELF_VALUE));
     }
 
     /**
@@ -302,79 +356,6 @@ class CountryServiceTest {
             countryService.findById(null);
         });
         String expectedMessage = "Country id must not be null!";
-        String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    /**
-     * Given:
-     * 1. Searching name is not null and not empty
-     * 2. The method CountryRepository.findByNameContainingIgnoreCase(nameExp) return ONE country matches the
-     * searching condition
-     * <p>
-     * Then expect:
-     * 1. The collection containing ONE CountryDto object is return.
-     * 2. A "self" link is appended to the result.
-     * <p>
-     * Target method: CountryService.findByText(String nameExp)
-     */
-    @Test
-    void findByText() {
-        /**
-         * Sample json format responded by findByName():
-         * {
-         *     "_embedded": {
-         *         "countryDtoList": [
-         *             {
-         *                 "id": 105,
-         *                 "name": "Vietnam",
-         *                 "_links": {
-         *                     "self": {
-         *                         "href": "http://localhost:8080/api/countries/105"
-         *                     }
-         *                 }
-         *             }
-         *         ]
-         *     },
-         *     "_links": {
-         *         "self": {
-         *             "href": "http://localhost:8080/api/countries?name=Viet"
-         *         }
-         *     }
-         * }
-         */
-        //given
-        given(countryRepository.findByNameContainingIgnoreCase(anyString())).willReturn(List.of(vietnam));
-        //when
-        CollectionModel<CountryDto> result = countryService.findByText("Viet");
-        //then
-        assertNotNull(result);
-        assertEquals(1, result.getContent().size());
-        assertNotNull(result.getLink(IanaLinkRelations.SELF_VALUE));
-    }
-
-    /**
-     * Target method: CountryService.findByText(String nameExp)
-     */
-    @Test
-    void findByText_givenNullSearchingString_thenThrowsException() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            countryService.findByText(null);
-        });
-        String expectedMessage = "Name must not be null and must not the empty!";
-        String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    /**
-     * Target method: CountryService.findByText(String nameExp)
-     */
-    @Test
-    void findByText_givenEmptySearchingString_thenThrowsException() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            countryService.findByText("");
-        });
-        String expectedMessage = "Name must not be null and must not the empty!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
     }

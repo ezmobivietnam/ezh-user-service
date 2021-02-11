@@ -5,9 +5,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.PagedModel;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Country;
 import vn.com.ezmobi.ezhealth.ezhuserservice.repositories.CountryRepository;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
@@ -18,7 +19,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -58,53 +58,10 @@ public class CountryServiceImpl implements CountryService {
     }
 
     @Override
-    public CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest) {
-        Assert.notNull(pageRequest, "PageRequest must not be null!");
-        //
-        Page<Country> countryEntityList;
-        if (Objects.isNull(nameExp) || nameExp.isBlank()) {
-            log.debug("Find all...");
-            // find all
-            countryEntityList = countryRepository.findAll(pageRequest);
-        } else {
-            log.debug("Find by name:" + nameExp);
-            //find by name
-            countryEntityList = countryRepository.findByNameContainingIgnoreCase(nameExp, pageRequest);
-        }
-        // convert Page<Country> to CollectionModel<CountryDto> then return to caller
-        PagedModel<CountryDto> pageModel = pagedResourcesAssembler.toModel(countryEntityList, countryAssembler);
-        //
-        return pageModel;
-    }
-
-    @Override
-    public CollectionModel<CountryDto> findAll() {
-        log.info("Start finding country data");
-        //
-        List<Country> countryList = countryRepository.findAll();
-        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countryList);
-        collectionModel.add(linkTo(methodOn(CountryController.class)
-                .findList(null, null, null)).withSelfRel().expand());
-        //
-        log.info("End finding country data. Will return data to caller right now.");
-        return collectionModel;
-    }
-
-    @Override
     public Optional<CountryDto> findById(Integer id) {
         Assert.notNull(id, "Country id must not be null!");
         Optional<Country> result = countryRepository.findById(id);
         return result.map(countryAssembler::toModel);
-    }
-
-    @Override
-    public CollectionModel<CountryDto> findByText(String nameExp) {
-        Assert.hasLength(nameExp, "Name must not be null and must not the empty!");
-        List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
-        CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
-        countryDtoModelList.add(linkTo(methodOn(CountryController.class)
-                .findList(nameExp, null, null)).withSelfRel().expand());
-        return countryDtoModelList;
     }
 
     @Override
@@ -131,6 +88,110 @@ public class CountryServiceImpl implements CountryService {
         Assert.notNull(countryId, "Country id must not be null!");
         countryRepository.deleteById(countryId);
     }
+
+    //===========================================================================================
+    // Implement methods from SimpleService served for the Simple Controller
+    //===========================================================================================
+
+    /**
+     * Finding data with pagination .
+     *
+     * @param withIds     (Optional) filtering the result by the level two id
+     * @param withName    (Optional) filtering the result with the given text.
+     * @param pageRequest (Required) the page request
+     * @return
+     */
+    @Override
+    public CollectionModel<CountryDto> findPaginated(List<Integer> withIds, String withName, PageRequest pageRequest) {
+        Page<Country> countryPage;
+        if (!CollectionUtils.isEmpty(withIds) && StringUtils.hasLength(withName)) {
+            //find all with address ids and containing given address
+            countryPage = countryRepository.findAllByIdInAndNameContainingIgnoreCase(withIds, withName, pageRequest);
+        } else if (!CollectionUtils.isEmpty(withIds)) {
+            // find all with address ids
+            countryPage = countryRepository.findAllByIdIn(withIds, pageRequest);
+        } else if (StringUtils.hasLength(withName)) {
+            // find all containing given address
+            countryPage = countryRepository.findAllByNameContainingIgnoreCase(withName, pageRequest);
+        } else {
+            // find all
+            countryPage = countryRepository.findAll(pageRequest);
+        }
+        return pagedResourcesAssembler.toModel(countryPage, countryAssembler);
+    }
+
+    /**
+     * Find all data from database. The result is not paginated.
+     *
+     * @param withIds  (Optional) filtering the result by the country's ids
+     * @param withName (Optional) filtering the result with the given text.
+     * @return
+     */
+    @Override
+    public CollectionModel<CountryDto> findAll(List<Integer> withIds, String withName) {
+        List<Country> countries;
+        if (!CollectionUtils.isEmpty(withIds) && StringUtils.hasLength(withName)) {
+            //find all with address ids and containing given address
+            countries = countryRepository.findAllByIdInAndNameContainingIgnoreCase(withIds, withName);
+        } else if (!CollectionUtils.isEmpty(withIds)) {
+            // find all with address ids
+            countries = countryRepository.findAllByIdIn(withIds);
+        } else if (StringUtils.hasLength(withName)) {
+            // find all containing given address
+            countries = countryRepository.findAllByNameContainingIgnoreCase(withName);
+        } else {
+            // find all
+            countries = countryRepository.findAll();
+        }
+        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countries);
+        collectionModel.add(linkTo(methodOn(CountryController.class).findList(withIds, withName,
+                null, null)).withSelfRel().expand());
+        //
+        return collectionModel;
+    }
+
+//    @Override
+//    public CollectionModel<CountryDto> findPaginated(String nameExp, PageRequest pageRequest) {
+//        Assert.notNull(pageRequest, "PageRequest must not be null!");
+//        //
+//        Page<Country> countryEntityList;
+//        if (Objects.isNull(nameExp) || nameExp.isBlank()) {
+//            log.debug("Find all...");
+//            // find all
+//            countryEntityList = countryRepository.findAll(pageRequest);
+//        } else {
+//            log.debug("Find by name:" + nameExp);
+//            //find by name
+//            countryEntityList = countryRepository.findByNameContainingIgnoreCase(nameExp, pageRequest);
+//        }
+//        // convert Page<Country> to CollectionModel<CountryDto> then return to caller
+//        PagedModel<CountryDto> pageModel = pagedResourcesAssembler.toModel(countryEntityList, countryAssembler);
+//        //
+//        return pageModel;
+//    }
+//
+//    @Override
+//    public CollectionModel<CountryDto> findAll() {
+//        log.info("Start finding country data");
+//        //
+//        List<Country> countryList = countryRepository.findAll();
+//        CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(countryList);
+//        collectionModel.add(linkTo(methodOn(CountryController.class)
+//                .findList(null, null, null)).withSelfRel().expand());
+//        //
+//        log.info("End finding country data. Will return data to caller right now.");
+//        return collectionModel;
+//    }
+//
+//    @Override
+//    public CollectionModel<CountryDto> findByText(String nameExp) {
+//        Assert.hasLength(nameExp, "Name must not be null and must not the empty!");
+//        List<Country> countryList = countryRepository.findByNameContainingIgnoreCase(nameExp);
+//        CollectionModel<CountryDto> countryDtoModelList = countryAssembler.toCollectionModel(countryList);
+//        countryDtoModelList.add(linkTo(methodOn(CountryController.class)
+//                .findList(nameExp, null, null)).withSelfRel().expand());
+//        return countryDtoModelList;
+//    }
 
     @Override
     public void deleteAllByIds(List<Integer> countryIds) {

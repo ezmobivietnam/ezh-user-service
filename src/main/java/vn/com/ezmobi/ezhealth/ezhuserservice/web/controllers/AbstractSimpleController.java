@@ -21,32 +21,24 @@ public abstract class AbstractSimpleController<T extends RepresentationModel<? e
     /**
      * Find and return a list of data.
      *
-     * @param page (Optional) the page number start from 0. Not null value will be used to config pagination.
-     * @param size (Optional) the size (number of items) in each page. Not null value will be used to config pagination.
-     * @param name (Optional) not null value will be used to search data by name.
+     * @param withIds  (Optional) filtering the result by the entity's ids
+     * @param withText (Optional) filtering the result by the given text
+     * @param page     (Optional) the page number start from 0. Not null value will be used to config pagination.
+     * @param size     (Optional) the size (number of items) in each page. Not null value will be used to config pagination.
      * @return
      */
-    public ResponseEntity<CollectionModel<T>> findList(String name, Integer page, Integer size) {
-
-        final String searchingName = (Objects.nonNull(name) && !name.isBlank()) ? name : null;
+    public ResponseEntity<CollectionModel<T>> findList(List<ID> withIds, String withText, Integer page, Integer size) {
         boolean isRequestPaging = Objects.nonNull(page) || Objects.nonNull(size);
         if (isRequestPaging) {
             // List with pagination
             int actualPageNumber = Objects.isNull(page) ? DEFAULT_PAGE_NUMBER : page;
             int actualPageSize = Objects.isNull(size) ? DEFAULT_PAGE_SIZE : size;
             PageRequest requestPage = PageRequest.of(actualPageNumber, actualPageSize);
-            CollectionModel<T> collectionModel = getService().findPaginated(searchingName, requestPage);
+            CollectionModel<T> collectionModel = getService().findPaginated(withIds, withText, requestPage);
             return ResponseEntity.ok(collectionModel);
         } else {
             // List all without pagination
-            CollectionModel<T> collectionModel;
-            if (Objects.nonNull(searchingName)) {
-                // list by name
-                collectionModel = getService().findByText(searchingName);
-            } else {
-                // list all
-                collectionModel = getService().findAll();
-            }
+            CollectionModel<T> collectionModel = getService().findAll(withIds, withText);
             return ResponseEntity.ok(collectionModel);
         }
     }

@@ -45,7 +45,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
     public ResponseEntity<CollectionModel<AddressDto>> findList(
             @PathVariable Integer countryId,
             @PathVariable Integer cityId,
-            @RequestParam(name = "addressIds", required = false) List<Integer> withAddressIds,
+            @RequestParam(name = "ids", required = false) List<Integer> withAddressIds,
             @RequestParam(name = "address", required = false) String withAddress,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {

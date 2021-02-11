@@ -12,6 +12,8 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.TaskExecutionException;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
@@ -24,16 +26,17 @@ import java.util.Map;
 @ControllerAdvice
 public class MvcExceptionHandler {
 
-//    @ExceptionHandler(ConstraintViolationException.class)
-//    public ResponseEntity<List<String>> beanValidationError(ConstraintViolationException exc) {
-//        log.error("Bean validation error", exc);
-//        List<String> errorsList = new ArrayList<>(exc.getConstraintViolations().size());
-//
-//        exc.getConstraintViolations().forEach(error -> errorsList.add(error.toString()));
-//
-//        return ResponseEntity.badRequest().body(errorsList);
-//    }
-//
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<Map<String, String>> beanValidationError(ConstraintViolationException exc) {
+        log.error("Bean validation error", exc);
+        Map<String, String> errors = new HashMap<>(exc.getConstraintViolations().size());
+        for (ConstraintViolation<?> violation : exc.getConstraintViolations()) {
+            String key = violation.getRootBeanClass().getName() + "." + violation.getPropertyPath();
+            errors.put(key, violation.getMessage());
+        }
+        return ResponseEntity.badRequest().body(errors);
+    }
+
 
     /**
      * Method parameters that are decorated with the @PathVariable annotation can be of any simple type such as int,

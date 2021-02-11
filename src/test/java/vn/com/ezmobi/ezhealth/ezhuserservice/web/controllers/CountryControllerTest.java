@@ -80,8 +80,8 @@ class CountryControllerTest extends BaseControllerTest {
         String findAllUrl = CountryController.BASE_URL;
         CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(List.of(vietnam, laos));
         collectionModel.add(linkTo(methodOn(CountryController.class)
-                .findList(null, null, null)).withSelfRel().expand());
-        given(countryService.findAll()).willReturn(collectionModel);
+                .findList(null, null, null, null)).withSelfRel().expand());
+        given(countryService.findAll(null, null)).willReturn(collectionModel);
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
@@ -112,9 +112,9 @@ class CountryControllerTest extends BaseControllerTest {
         // given
         String findAllUrl = CountryController.BASE_URL;
         CollectionModel<CountryDto> emptyCollectionModel = CollectionModel.empty();
-        emptyCollectionModel.add(linkTo(methodOn(CountryController.class).findList(null, null, null))
+        emptyCollectionModel.add(linkTo(methodOn(CountryController.class).findList(null,null, null, null))
                 .withSelfRel().expand());
-        given(countryService.findAll()).willReturn(emptyCollectionModel);
+        given(countryService.findAll(isNull(), isNull())).willReturn(emptyCollectionModel);
 
         //when
         mockMvc.perform(get(findAllUrl).contentType(MediaType.APPLICATION_JSON))
@@ -126,9 +126,12 @@ class CountryControllerTest extends BaseControllerTest {
     /**
      * Given:
      * 1. Target endpoint {http://localhost:8080/api/countries} is used.
-     * 2. The parameter "name" is set to the value "viet"
-     * 3. The method CountryService.findByText() return collection included ONE element
+     * 2. The parameter "ids" is NOT set
+     * 3. The parameter "name" is set to the value "viet"
+     * 4. The method findAll(List<Integer> withIds, String withName) return collection of ONE element
+     *
      * When: The endpoint is called by using the GET method
+     *
      * Then expect:
      * 1. Client will receive the list of ONE country in json format
      * 2. The "self" link is added to the response
@@ -141,8 +144,8 @@ class CountryControllerTest extends BaseControllerTest {
         String findByNameUrl = CountryController.BASE_URL + "?name=viet";
         CollectionModel<CountryDto> collectionModel = countryAssembler.toCollectionModel(List.of(vietnam));
         collectionModel.add(linkTo(methodOn(CountryController.class)
-                .findList("viet", null, null)).withSelfRel().expand());
-        given(countryService.findByText(anyString())).willReturn(collectionModel);
+                .findList(null,"viet", null, null)).withSelfRel().expand());
+        given(countryService.findAll(isNull(), anyString())).willReturn(collectionModel);
 
         //when
         mockMvc.perform(get(findByNameUrl).contentType(MediaType.APPLICATION_JSON))
@@ -156,7 +159,8 @@ class CountryControllerTest extends BaseControllerTest {
     void findList_givenWrongParam_thenFindAll() throws Exception {
         // given
         String findByParamUrl = CountryController.BASE_URL + "?anotherparam=viet";
-        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
+        given(countryService.findAll(null, null))
+                .willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByParamUrl).contentType(MediaType.APPLICATION_JSON))
@@ -170,7 +174,8 @@ class CountryControllerTest extends BaseControllerTest {
     void findByName_givenNameParamEmpty_thenFindAll() throws Exception {
         // given
         String findByEmptyNameUrl = CountryController.BASE_URL + "?name=";
-        given(countryService.findAll()).willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
+        given(countryService.findAll(null, ""))
+                .willReturn(countryAssembler.toCollectionModel(List.of(vietnam, laos)));
 
         //when
         mockMvc.perform(get(findByEmptyNameUrl).contentType(MediaType.APPLICATION_JSON))

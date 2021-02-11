@@ -198,7 +198,7 @@ public class AddressServiceImpl implements AddressService {
                 .findByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
         Address address = addressOptional.orElseThrow(() -> {
             String s = String.format("Failed to search the address with (address id=[%d], city id=[%d] and country " +
-                            "id=[%d])", addressId, cityId, countryId);
+                    "id=[%d])", addressId, cityId, countryId);
             return new TaskExecutionException(s);
         });
         // Use mapstruct to map the nonnull attributes from dto to entity.
@@ -221,57 +221,123 @@ public class AddressServiceImpl implements AddressService {
         addressRepository.deleteByIdAndCity_IdAndCity_Country_Id(addressId, cityId, countryId);
     }
 
+    //===========================================================================================
+    // Implement methods from SimpleService serving the Simple Controller
+    //===========================================================================================
     /**
-     * Finding data with pagination .
+     * Finding addresses with pagination .
+     * If filter parameters is not specified then find all.
      *
-     * @param whatToFind  (Optional) null value indicates find all otherwise finding by a specific criteria.
-     * @param pageRequest (Required) the page request
+     * @param withAddressIds (Optional) filtering the result by the address ids
+     * @param withAddress    (Optional) filtering the result with the given address.
+     * @param pageRequest    (Required) the page request
      * @return
      */
     @Override
-    public CollectionModel findPaginated(String whatToFind, PageRequest pageRequest) {
+    public CollectionModel<AddressDto> findPaginated(List<Integer> withAddressIds,
+                                                     String withAddress,
+                                                     PageRequest pageRequest) {
         Assert.notNull(pageRequest, "PageRequest must not be null!");
-        Page<Address> addressesPage;
-        if (StringUtils.hasLength(whatToFind)) {
-            //find all records having "whatToFind"
-            addressesPage = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind, pageRequest);
+        //
+        Page<Address> addressPage;
+        if (!CollectionUtils.isEmpty(withAddressIds) && StringUtils.hasLength(withAddress)) {
+            //find all with address ids and containing given address
+            addressPage = addressRepository.findAllByIdInAndAddressContainingIgnoreCase(withAddressIds, withAddress, pageRequest);
+        } else if (!CollectionUtils.isEmpty(withAddressIds)) {
+            // find all with address ids
+            addressPage = addressRepository.findAllByIdIn(withAddressIds, pageRequest);
+        } else if (StringUtils.hasLength(withAddress)) {
+            // find all containing given address
+            addressPage = addressRepository.findAllByAddressContainingIgnoreCase(withAddress, pageRequest);
         } else {
-            // find all records
-            addressesPage = addressRepository.findAll(pageRequest);
+            // find all
+            addressPage = addressRepository.findAll(pageRequest);
         }
-        return pagedResourcesAssembler.toModel(addressesPage, addressAssembler);
+        return pagedResourcesAssembler.toModel(addressPage, addressAssembler);
     }
 
     /**
      * Find all data from database. The result is not paginated.
+     * If filter parameters is not specified then find all.
      *
+     * @param withAddressIds (Optional) filtering the result by the level two id
+     * @param withAddress    (Optional) filtering the result with the given text.
      * @return
      */
     @Override
-    public CollectionModel<AddressDto> findAll() {
-        List<Address> addresses = addressRepository.findAll();
+    public CollectionModel<AddressDto> findAll(List<Integer> withAddressIds, String withAddress) {
+        List<Address> addresses;
+        if (!CollectionUtils.isEmpty(withAddressIds) && StringUtils.hasLength(withAddress)) {
+            //find all with address ids and containing given address
+            addresses = addressRepository.findAllByIdInAndAddressContainingIgnoreCase(withAddressIds, withAddress);
+        } else if (!CollectionUtils.isEmpty(withAddressIds)) {
+            // find all with address ids
+            addresses = addressRepository.findAllByIdIn(withAddressIds);
+        } else if (StringUtils.hasLength(withAddress)) {
+            // find all containing given address
+            addresses = addressRepository.findAllByAddressContainingIgnoreCase(withAddress);
+        } else {
+            // find all
+            addresses = addressRepository.findAll();
+        }
         CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
-        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
-                .findList(null, null, null))
-                .withSelfRel().expand());
+        collectionModel.add(linkTo(methodOn(AddressSimpleController.class).findList(withAddressIds, withAddress,
+                null, null)).withSelfRel().expand());
+        //
         return collectionModel;
     }
 
-    /**
-     * Find in a specific column of a table for a specific value for example name, address...
-     *
-     * @param whatToFind something to be found
-     * @return
-     */
-    @Override
-    public CollectionModel<AddressDto> findByText(String whatToFind) {
-        List<Address> addresses = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind);
-        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
-        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
-                .findList(whatToFind, null, null))
-                .withSelfRel().expand());
-        return collectionModel;
-    }
+//    /**
+//     * Finding data with pagination .
+//     *
+//     * @param whatToFind  (Optional) null value indicates find all otherwise finding by a specific criteria.
+//     * @param pageRequest (Required) the page request
+//     * @return
+//     */
+//    @Override
+//    public CollectionModel findPaginated(String whatToFind, PageRequest pageRequest) {
+//        Assert.notNull(pageRequest, "PageRequest must not be null!");
+//        Page<Address> addressesPage;
+//        if (StringUtils.hasLength(whatToFind)) {
+//            //find all records having "whatToFind"
+//            addressesPage = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind, pageRequest);
+//        } else {
+//            // find all records
+//            addressesPage = addressRepository.findAll(pageRequest);
+//        }
+//        return pagedResourcesAssembler.toModel(addressesPage, addressAssembler);
+//    }
+
+//    /**
+//     * Find all data from database. The result is not paginated.
+//     *
+//     * @return
+//     */
+//    @Override
+//    public CollectionModel<AddressDto> findAll() {
+//        List<Address> addresses = addressRepository.findAll();
+//        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
+//        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
+//                .findList(null, null, null))
+//                .withSelfRel().expand());
+//        return collectionModel;
+//    }
+//
+//    /**
+//     * Find in a specific column of a table for a specific value for example name, address...
+//     *
+//     * @param whatToFind something to be found
+//     * @return
+//     */
+//    @Override
+//    public CollectionModel<AddressDto> findByText(String whatToFind) {
+//        List<Address> addresses = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind);
+//        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
+//        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
+//                .findList(whatToFind, null, null))
+//                .withSelfRel().expand());
+//        return collectionModel;
+//    }
 
     @Override
     public void deleteAllByIds(List<Integer> addressIds) {
