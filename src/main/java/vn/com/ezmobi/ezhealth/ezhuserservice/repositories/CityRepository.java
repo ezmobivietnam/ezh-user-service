@@ -11,6 +11,14 @@ import java.util.Optional;
 
 public interface CityRepository extends JpaRepository<City, Integer>, JpaSpecificationExecutor<City> {
 
+    Page<City> findAllByIdInAndNameContainingIgnoreCaseAndAndCountry_Id(List<Integer> cityIds, String name,
+                                                                        Integer countryId, Pageable pageable);
+    List<City> findAllByIdInAndNameContainingIgnoreCaseAndAndCountry_Id(List<Integer> cityIds, String name,
+                                                                        Integer countryId);
+
+    Page<City> findAllByIdInAndCountry_Id(List<Integer> cityIds, Integer countryId, Pageable pageable);
+    List<City> findAllByIdInAndCountry_Id(List<Integer> cityIds, Integer countryId);
+
     Page<City> findAllByNameContainingIgnoreCaseAndCountry_Id(String cityName,
                                                                      Integer countryId,
                                                                      Pageable pageRequest);

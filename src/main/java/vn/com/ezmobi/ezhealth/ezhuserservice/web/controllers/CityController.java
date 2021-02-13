@@ -10,6 +10,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.CityService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * Ref:
@@ -33,27 +34,30 @@ public class CityController extends AbstractLevelOneController<CityDto, Integer>
     }
 
     /**
-     * Find and return a list of data.
+     * Find and return a list of cities.
      * Sample usage:
      * http://localhost:8080/api/countries/2/cities/?page=0&size=2&name=a
      *
-     * @param countryId (Required) null value indicates search all city without constraint to a country
-     * @param name      (Optional) null value indicates search all
-     * @param page      (Optional) null value indicates searching result is paginated and the page {page} is display
-     * @param size      (Optional) null value indicates searching result is paginated and the size of page is {size}
+     * @param countryId   (Required) The id of the root/owing object
+     * @param withCityIds (Optional) filtering the result with the given city ids
+     * @param withName    (Optional) filtering the result with given name
+     * @param page        (Optional) Non-null value indicates searching result is paginated and the page {page} is
+     *                    display
+     * @param size        (Optional) Non-null value indicates searching result is paginated and the size of page is {
+     *                    size}
      * @return
      */
     @Override
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<CollectionModel<CityDto>> findList(
             @PathVariable Integer countryId,
-            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "ids", required = false) List<Integer> withCityIds,
+            @RequestParam(name = "name", required = false) String withName,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {
-
-        log.debug(String.format("Finding cities with conditions: countryId=%d, pageNumber=%d, pageSize=%d, name=%s",
-                countryId, page, size, name));
-        return super.findList(countryId, name, page, size);
+        log.debug(String.format("Finding cities with conditions: countryId=[%d], withCityIds=[%s], " +
+                "withName=[%s], pageNumber=[%d], pageSize=[%d]", countryId, withCityIds, withName, page, size));
+        return super.findList(countryId, withCityIds, withName, page, size);
     }
 
     @Override

@@ -12,6 +12,7 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -28,35 +29,34 @@ public abstract class AbstractLevelOneController<T extends RepresentationModel<?
     /**
      * Find and return a list of RepresentationModel.
      *
-     * @param rootId (Required) The id of the root/owing object
-     * @param name   (Optional) null value indicates search all
-     * @param page   (Optional) null value indicates searching result is paginated and the page {page} is display
-     * @param size   (Optional) null value indicates searching result is paginated and the size of page is {size}
+     * @param rootId             (Required) The id of the root/owing object
+     * @param withLevelOneIdList (Optional) filtering the result with the given level one ids
+     * @param withText           (Optional) filtering the result with given text
+     * @param page               (Optional) Non-null value indicates searching result is paginated and the page {page}
+     *                           is display
+     * @param size               (Optional) Non-null value indicates searching result is paginated and the size of page
+     *                           is {size}
      * @return
      */
-    public ResponseEntity<CollectionModel<T>> findList(ID rootId, String name, Integer page,
+    public ResponseEntity<CollectionModel<T>> findList(ID rootId,
+                                                       List<ID> withLevelOneIdList,
+                                                       String withText,
+                                                       Integer page,
                                                        Integer size) {
         Assert.notNull(rootId, "Root id must not be null!");
 
-        final String searchingName = (Objects.nonNull(name) && !name.isBlank()) ? name : null;
         boolean isRequestPaging = Objects.nonNull(page) || Objects.nonNull(size);
         if (isRequestPaging) {
             // List with pagination
             int actualPageNumber = Objects.isNull(page) ? DEFAULT_PAGE_NUMBER : page;
             int actualPageSize = Objects.isNull(size) ? DEFAULT_PAGE_SIZE : size;
             PageRequest requestPage = PageRequest.of(actualPageNumber, actualPageSize);
-            CollectionModel<T> collectionModel = getService().findPaginated(rootId, searchingName, requestPage);
+            CollectionModel<T> collectionModel = getService().findPaginated(rootId, withLevelOneIdList, withText,
+                    requestPage);
             return ResponseEntity.ok(collectionModel);
         } else {
             // List all without pagination
-            CollectionModel<T> collectionModel;
-            if (Objects.nonNull(searchingName)) {
-                // list by name
-                collectionModel = getService().findByText(rootId, searchingName);
-            } else {
-                // list all
-                collectionModel = getService().findAll(rootId);
-            }
+            CollectionModel<T> collectionModel = getService().findAll(rootId, withLevelOneIdList, withText);
             if (collectionModel.getContent().isEmpty()) {
                 throw new DataNotFoundException();
             }

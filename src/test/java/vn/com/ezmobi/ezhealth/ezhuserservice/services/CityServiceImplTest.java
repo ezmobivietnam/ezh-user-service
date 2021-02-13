@@ -59,15 +59,17 @@ class CityServiceImplTest {
     }
 
     /**
-     * Test findPaginated with given conditions:
+     * Given:
      * 1. Country id is not null
-     * 2. Searching name is null (find all)
-     * 3. PageRequest is not null and the data is more than one page
+     * 2. Searching city ids are not specified
+     * 3. Searching city name is not specified
+     * 4. PageRequest is not null and the data is fixed into two pages
      * Then expect:
      * 1. List of cities of a country are returned.
      * 2. links (first, self, next, last) are added to the response
      * <p>
-     * Target method: CityService.findPaginated(Integer rootId, String nameExp, PageRequest pageRequest)
+     * Target method:
+     * CityService.findPaginated(Integer countryId, List<Integer> withCityIds, String withName, PageRequest pageRequest)
      */
     @Test
     void findPaginated() {
@@ -79,7 +81,7 @@ class CityServiceImplTest {
                         allEntitiesList.size()));
         //when
         CollectionModel<CityDto> cityDtoList = cityService
-                .findPaginated(2, null, PageRequest.of(0, 2));
+                .findPaginated(2, null, null, PageRequest.of(0, 2));
         PagedModel<City> pagedModel = (PagedModel) cityDtoList;
         //then expect
         assertNotNull(pagedModel.getMetadata());
@@ -93,15 +95,17 @@ class CityServiceImplTest {
     }
 
     /**
-     * Test findPaginated with given conditions:
+     * Given:
      * 1. Country id is not null
+     * 2. Searching city ids are not specified
      * 2. Searching name is 'a'
      * 3. PageRequest is not null and the data fixed to one page
      * Then expect:
      * 1. List of cities of a country are returned.
      * 2. Only link 'self' is added to the response
      * <p>
-     * Target method: CityService.findPaginated(Integer rootId, String nameExp, PageRequest pageRequest)
+     * Target method:
+     * CityService.findPaginated(Integer countryId, List<Integer> withCityIds, String withName, PageRequest pageRequest)
      */
     @Test
     void findPaginated_givenNameNotNullAndDataFixedInOnePage_thenAllDataReturnedWithSelfLink() {
@@ -112,7 +116,7 @@ class CityServiceImplTest {
                 .willReturn(new PageImpl<City>(allEntitiesList, pageRequest, allEntitiesList.size()));
         //when
         CollectionModel<CityDto> cityDtoList = cityService
-                .findPaginated(2, null, pageRequest);
+                .findPaginated(2, null, null, pageRequest);
         PagedModel<City> pagedModel = (PagedModel) cityDtoList;
         //then expect
         assertNotNull(pagedModel.getMetadata());
@@ -126,13 +130,14 @@ class CityServiceImplTest {
     }
 
     /**
-     * Target method: CityService.findPaginated(Integer rootId, String nameExp, PageRequest pageRequest)
+     * Target method:
+     * CityService.findPaginated(Integer countryId, List<Integer> withCityIds, String withName, PageRequest pageRequest)
      */
     @Test
     void findPaginated_givenNullCountryId_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             Integer countryId = null;
-            cityService.findPaginated(countryId, "anyString", PageRequest.of(0, 2));
+            cityService.findPaginated(countryId, null, "anyString", PageRequest.of(0, 2));
         });
         String expectedMessage = "Country id must not be null!";
         String actualMessage = exception.getMessage();
@@ -140,12 +145,13 @@ class CityServiceImplTest {
     }
 
     /**
-     * Target method: CityService.findPaginated(Integer rootId, String nameExp, PageRequest pageRequest)
+     * Target method:
+     * CityService.findPaginated(Integer countryId, List<Integer> withCityIds, String withName, PageRequest pageRequest)
      */
     @Test
     void findPaginated_givenNullPageRequest_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            cityService.findPaginated(2, null, null);
+            cityService.findPaginated(2, null, null, null);
         });
         String expectedMessage = "PageRequest must not be null!";
         String actualMessage = exception.getMessage();
@@ -235,41 +241,10 @@ class CityServiceImplTest {
     }
 
     /**
-     * Given a country id then return:
-     * 1. all cities of that country.
-     * 2. A self link
-     * <p>
-     * Target method: CityService.findAll(Integer rootId)
-     */
-    @Test
-    void findAll() {
-        //given
-        List<City> allEntitiesList = List.of(city01Entity, city02Entity, city03Entity);
-        given(cityRepository.findAllByCountry_Id(anyInt())).willReturn(allEntitiesList);
-        //when
-        CollectionModel<CityDto> cityDtoList = cityService.findAll(2);
-        assertEquals(cityDtoList.getContent().size(), allEntitiesList.size());
-        assertNotNull(cityDtoList.getLink(IanaLinkRelations.SELF_VALUE).get());
-    }
-
-    /**
-     * Target method: CityService.findAll(Integer rootId)
-     */
-    @Test
-    void findAll_givenNullCountryId_thenThrowsException() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            cityService.findAll(null);
-        });
-        String expectedMessage = "Country id must not be null!";
-        String actualMessage = exception.getMessage();
-        assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    /**
      * Target method: CityService.findAll(List<Integer> withCityIds, String withName)
      */
     @Test
-    void findAll_00_givenAllParametersIsNull_thenReturnAllDataWithSelfLink() {
+    void findAll_givenAllParametersIsNull_thenReturnAllDataWithSelfLink() {
         //given
         List<City> allEntitiesList = List.of(city01Entity, city02Entity, city03Entity);
         given(cityRepository.findAll()).willReturn(allEntitiesList);
@@ -324,25 +299,6 @@ class CityServiceImplTest {
         String expectedMessage = "City id must not be null!";
         String actualMessage = exception.getMessage();
         assertTrue(actualMessage.contains(expectedMessage));
-    }
-
-    /**
-     * Given valid country id and a name then return:
-     * 1. A list of cities contain the searching name
-     * 2. A self link
-     * <p>
-     * Target method: CityService.findByText(Integer rootId, String name)
-     */
-    @Test
-    void findByText() {
-        // given
-        List<City> cityEntities = List.of(city01Entity, city02Entity, city03Entity);
-        given(cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(anyString(), anyInt()))
-                .willReturn(cityEntities);
-        //when
-        CollectionModel<CityDto> cityDtoList = cityService.findByText(2, "a");
-        assertEquals(cityDtoList.getContent().size(), cityEntities.size());
-        assertNotNull(cityDtoList.getLink(IanaLinkRelations.SELF_VALUE));
     }
 
     /**

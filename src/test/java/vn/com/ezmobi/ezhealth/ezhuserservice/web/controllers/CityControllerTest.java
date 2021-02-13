@@ -145,7 +145,7 @@ class CityControllerTest extends BaseControllerTest {
         PagedResourcesAssembler pagedResourcesAssembler = new PagedResourcesAssembler(resolver, baseUri);
         CollectionModel<CityDto> cityDtoCollectionModel = pagedResourcesAssembler.toModel(pageModel, cityAssembler);
         //
-        given(service.findPaginated(anyInt(), anyString(), any(PageRequest.class)))
+        given(service.findPaginated(anyInt(), isNull(), anyString(), any(PageRequest.class)))
                 .willReturn(cityDtoCollectionModel);
         //when
         String requestURI = String.format("/api/countries/%d/cities?name=%s&page=%d&size=%d", countryId,
@@ -177,8 +177,8 @@ class CityControllerTest extends BaseControllerTest {
                 bcharCityEntity, skikdaCityEntity));
         collectionModel.add(
                 linkTo(methodOn(CityController.class)
-                        .findList(countryId, null, null, null)).withSelfRel().expand());
-        given(service.findAll(anyInt())).willReturn(collectionModel);
+                        .findList(countryId, null, null, null, null)).withSelfRel().expand());
+        given(service.findAll(anyInt(), isNull(), isNull())).willReturn(collectionModel);
         //when
         mockMvc.perform(MockMvcRequestBuilders.get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())

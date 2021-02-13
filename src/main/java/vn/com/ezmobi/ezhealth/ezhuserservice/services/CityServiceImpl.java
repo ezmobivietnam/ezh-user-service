@@ -22,7 +22,6 @@ import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -65,40 +64,106 @@ public class CityServiceImpl implements CityService {
      * @param pageRequest (Required) the page request
      * @return
      */
-    @Override
-    public CollectionModel<CityDto> findPaginated(Integer countryId, String name, PageRequest pageRequest) {
-        Assert.notNull(countryId, "Country id must not be null!");
-        Assert.notNull(pageRequest, "PageRequest must not be null!");
-        //
-        log.debug(String.format("Country id=%d, country name=%s, pageRequest=%s", countryId, name, pageRequest));
-        Page<City> cityEntityPage;
-        if (Objects.isNull(name) || name.isBlank()) {
-            // find all cities belong to a country
-            cityEntityPage = cityRepository.findAllByCountry_Id(countryId, pageRequest);
-        } else {
-            // finding pagination by name
-            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId,
-                    pageRequest);
-        }
-        return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
-    }
+//    @Override
+//    public CollectionModel<CityDto> findPaginated(Integer countryId, String name, PageRequest pageRequest) {
+//        Assert.notNull(countryId, "Country id must not be null!");
+//        Assert.notNull(pageRequest, "PageRequest must not be null!");
+//        //
+//        log.debug(String.format("Country id=%d, country name=%s, pageRequest=%s", countryId, name, pageRequest));
+//        Page<City> cityEntityPage;
+//        if (Objects.isNull(name) || name.isBlank()) {
+//            // find all cities belong to a country
+//            cityEntityPage = cityRepository.findAllByCountry_Id(countryId, pageRequest);
+//        } else {
+//            // finding pagination by name
+//            cityEntityPage = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId,
+//                    pageRequest);
+//        }
+//        return pagedResourcesAssembler.toModel(cityEntityPage, assembler);
+//    }
+
 
     /**
-     * Finding all cities (without pagination) belong to the country by countryId.
+     * Finding data with pagination belong to the root object by rootId.
      *
-     * @param countryId (Required) the country id
+     * @param countryId   (Required) the root ID
+     * @param withCityIds (Optional) filtering the result with the given city ids
+     * @param withName    (Optional) filtering the result with given name
+     * @param pageRequest (Required) the page request
      * @return
      */
     @Override
-    public CollectionModel<CityDto> findAll(Integer countryId) {
+    public CollectionModel<CityDto> findPaginated(Integer countryId, List<Integer> withCityIds, String withName,
+                                                  PageRequest pageRequest) {
         Assert.notNull(countryId, "Country id must not be null!");
-        List<City> cityEntityList = cityRepository.findAllByCountry_Id(countryId);
-        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
-        collectionModel.add(
-                linkTo(methodOn(CityController.class)
-                        .findList(countryId, null, null, null)).withSelfRel().expand());
+        Assert.notNull(pageRequest, "PageRequest must not be null!");
+        Page<City> cityPage;
+        if (!CollectionUtils.isEmpty(withCityIds) && StringUtils.hasLength(withName)) {
+            // find all cities with given ids and name
+            cityPage = cityRepository.findAllByIdInAndNameContainingIgnoreCaseAndAndCountry_Id(withCityIds, withName,
+                    countryId, pageRequest);
+        } else if (!CollectionUtils.isEmpty(withCityIds)) {
+            // find all cities with given ids
+            cityPage = cityRepository.findAllByIdInAndCountry_Id(withCityIds, countryId, pageRequest);
+        } else if (StringUtils.hasLength(withName)) {
+            // find all cities with given name
+            cityPage = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(withName, countryId, pageRequest);
+        } else {
+            // find all cities (without any conditions)
+            cityPage = cityRepository.findAllByCountry_Id(countryId, pageRequest);
+        }
+        return pagedResourcesAssembler.toModel(cityPage, assembler);
+    }
+
+    /**
+     * Finding data with pagination belong to the root object by rootId.
+     *
+     * @param countryId   (Required) the root ID
+     * @param withCityIds (Optional) filtering the result with the given city ids
+     * @param withName    (Optional) filtering the result with given name
+     * @return
+     */
+    @Override
+    public CollectionModel<CityDto> findAll(Integer countryId, List<Integer> withCityIds, String withName) {
+        Assert.notNull(countryId, "Country id must not be null!");
+        List<City> cities;
+        if (!CollectionUtils.isEmpty(withCityIds) && StringUtils.hasLength(withName)) {
+            // find all cities with given ids and name
+            cities = cityRepository.findAllByIdInAndNameContainingIgnoreCaseAndAndCountry_Id(withCityIds, withName, countryId);
+        } else if (!CollectionUtils.isEmpty(withCityIds)) {
+            // find all cities with given ids
+            cities = cityRepository.findAllByIdInAndCountry_Id(withCityIds, countryId);
+        } else if (StringUtils.hasLength(withName)) {
+            // find all cities with given name
+            cities = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(withName, countryId);
+        } else {
+            // find all cities (without any conditions)
+            cities = cityRepository.findAllByCountry_Id(countryId);
+        }
+        // converting to collection model
+        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cities);
+        // adding self link
+        collectionModel.add(linkTo(methodOn(CityController.class).findList(countryId, withCityIds, withName, null,
+                null)).withSelfRel().expand());
         return collectionModel;
     }
+
+//    /**
+//     * Finding all cities (without pagination) belong to the country by countryId.
+//     *
+//     * @param countryId (Required) the country id
+//     * @return
+//     */
+//    @Override
+//    public CollectionModel<CityDto> findAll(Integer countryId) {
+//        Assert.notNull(countryId, "Country id must not be null!");
+//        List<City> cityEntityList = cityRepository.findAllByCountry_Id(countryId);
+//        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+//        collectionModel.add(
+//                linkTo(methodOn(CityController.class)
+//                        .findList(countryId, null, null, null)).withSelfRel().expand());
+//        return collectionModel;
+//    }
 
     /**
      * Finding an city belong to the country.
@@ -115,24 +180,24 @@ public class CityServiceImpl implements CityService {
         return cityEntity.map(assembler::toModel);
     }
 
-    /**
-     * Finding cities belong to a country by name.
-     *
-     * @param countryId (Required) the country id
-     * @param name      (Required) the name of the city to be found
-     * @return
-     */
-    @Override
-    public CollectionModel<CityDto> findByText(Integer countryId, String name) {
-        Assert.notNull(countryId, "Country id must not be null!");
-        Assert.notNull(name, "City name must not be null!");
-        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId);
-        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
-        collectionModel.add(
-                linkTo(methodOn(CityController.class)
-                        .findList(countryId, name, null, null)).withSelfRel().expand());
-        return collectionModel;
-    }
+//    /**
+//     * Finding cities belong to a country by name.
+//     *
+//     * @param countryId (Required) the country id
+//     * @param name      (Required) the name of the city to be found
+//     * @return
+//     */
+//    @Override
+//    public CollectionModel<CityDto> findByText(Integer countryId, String name) {
+//        Assert.notNull(countryId, "Country id must not be null!");
+//        Assert.notNull(name, "City name must not be null!");
+//        List<City> cityEntityList = cityRepository.findAllByNameContainingIgnoreCaseAndCountry_Id(name, countryId);
+//        CollectionModel<CityDto> collectionModel = assembler.toCollectionModel(cityEntityList);
+//        collectionModel.add(
+//                linkTo(methodOn(CityController.class)
+//                        .findList(countryId, name, null, null)).withSelfRel().expand());
+//        return collectionModel;
+//    }
 
     /**
      * Adding new city to the country.

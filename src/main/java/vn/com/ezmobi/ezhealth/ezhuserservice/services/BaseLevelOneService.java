@@ -6,6 +6,7 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.validation.annotation.Validated;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -17,20 +18,23 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>,
     /**
      * Finding data with pagination belong to the root object by rootId.
      *
-     * @param rootId           (Required) the root ID
-     * @param withFilterString (Optional) the string used to filter the searching result
-     * @param pageRequest      (Required) the page request
+     * @param rootId             (Required) the root ID
+     * @param withLevelOneIdList (Optional) filtering the result with the given level one ids
+     * @param withText           (Optional) filtering the result with given text
+     * @param pageRequest        (Required) the page request
      * @return
      */
-    CollectionModel<T> findPaginated(ID rootId, String withFilterString, PageRequest pageRequest);
+    CollectionModel<T> findPaginated(ID rootId, List<ID> withLevelOneIdList, String withText, PageRequest pageRequest);
 
     /**
-     * Finding all data (without pagination) belong to the root object by rootId.
+     * Finding data with pagination belong to the root object by rootId.
      *
-     * @param rootId (Required) the root ID
+     * @param rootId             (Required) the root ID
+     * @param withLevelOneIdList (Optional) filtering the result with the given level one ids
+     * @param withText           (Optional) filtering the result with given text
      * @return
      */
-    CollectionModel<T> findAll(ID rootId);
+    CollectionModel<T> findAll(ID rootId, List<ID> withLevelOneIdList, String withText);
 
     /**
      * Finding an item with id is levelOneId which belong to the root/owner id is rootId.
@@ -40,15 +44,6 @@ public interface BaseLevelOneService<T extends RepresentationModel<? extends T>,
      * @return
      */
     Optional<T> findById(ID rootId, ID levelOneId);
-
-    /**
-     * Finding items belong to a root object by name.
-     *
-     * @param rootId           (Required) the root ID
-     * @param withFilterString (Required) the string used to filter the searching result
-     * @return
-     */
-    CollectionModel<T> findByText(ID rootId, String withFilterString);
 
     /**
      * Adding new items to the root object.
