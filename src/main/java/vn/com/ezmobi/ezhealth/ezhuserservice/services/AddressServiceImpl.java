@@ -287,58 +287,6 @@ public class AddressServiceImpl implements AddressService {
         return collectionModel;
     }
 
-//    /**
-//     * Finding data with pagination .
-//     *
-//     * @param whatToFind  (Optional) null value indicates find all otherwise finding by a specific criteria.
-//     * @param pageRequest (Required) the page request
-//     * @return
-//     */
-//    @Override
-//    public CollectionModel findPaginated(String whatToFind, PageRequest pageRequest) {
-//        Assert.notNull(pageRequest, "PageRequest must not be null!");
-//        Page<Address> addressesPage;
-//        if (StringUtils.hasLength(whatToFind)) {
-//            //find all records having "whatToFind"
-//            addressesPage = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind, pageRequest);
-//        } else {
-//            // find all records
-//            addressesPage = addressRepository.findAll(pageRequest);
-//        }
-//        return pagedResourcesAssembler.toModel(addressesPage, addressAssembler);
-//    }
-
-//    /**
-//     * Find all data from database. The result is not paginated.
-//     *
-//     * @return
-//     */
-//    @Override
-//    public CollectionModel<AddressDto> findAll() {
-//        List<Address> addresses = addressRepository.findAll();
-//        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
-//        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
-//                .findList(null, null, null))
-//                .withSelfRel().expand());
-//        return collectionModel;
-//    }
-//
-//    /**
-//     * Find in a specific column of a table for a specific value for example name, address...
-//     *
-//     * @param whatToFind something to be found
-//     * @return
-//     */
-//    @Override
-//    public CollectionModel<AddressDto> findByText(String whatToFind) {
-//        List<Address> addresses = addressRepository.findAllByAddressContainingIgnoreCase(whatToFind);
-//        CollectionModel<AddressDto> collectionModel = addressAssembler.toCollectionModel(addresses);
-//        collectionModel.add(linkTo(methodOn(AddressSimpleController.class)
-//                .findList(whatToFind, null, null))
-//                .withSelfRel().expand());
-//        return collectionModel;
-//    }
-
     @Override
     public void deleteAllByIds(List<Integer> addressIds) {
         Assert.notEmpty(addressIds, "List of IDs must not be null or empty");

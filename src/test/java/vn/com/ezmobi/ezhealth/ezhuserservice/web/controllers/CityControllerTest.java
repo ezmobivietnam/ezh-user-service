@@ -203,12 +203,12 @@ class CityControllerTest extends BaseControllerTest {
         //given
         int countryId = 2;
         String url = String.format("http://localhost:8080/api/countries/%d/cities", countryId);
-        City newCity = City.builder().id(1).name("New city").country(algeriaCountryEntity).build();
+        City newCity = City.builder().id(1).name("New city").capital(false).country(algeriaCountryEntity).build();
         given(service.addNew(anyInt(), any(CityDto.class))).willReturn(cityAssembler.toModel(newCity));
         //when
         mockMvc.perform(MockMvcRequestBuilders.post(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(CityDto.builder().name("New city").build())))
+                .content(asJsonString(CityDto.builder().name("New city").capital(false).build())))
                 .andExpect(status().isCreated()).andExpect(header()
                 .exists("Location"));
     }
@@ -218,14 +218,15 @@ class CityControllerTest extends BaseControllerTest {
         //given
         int countryId = 2;
         int cityId = 59;
-        City updatedCityEnity = City.builder().id(59).name("Batna_UPDATED").country(algeriaCountryEntity).build();
+        City updatedCityEnity =
+                City.builder().id(59).name("Batna_UPDATED").capital(false).country(algeriaCountryEntity).build();
         String url = String.format("http://localhost:8080/api/countries/%d/cities/%d", countryId, cityId);
         given(service.update(anyInt(), any(CityDto.class), anyInt()))
                 .willReturn(cityAssembler.toModel(updatedCityEnity));
         //when
         mockMvc.perform(MockMvcRequestBuilders.put(url)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(asJsonString(CityDto.builder().name("Batna_UPDATED").build())))
+                .content(asJsonString(CityDto.builder().name("Batna_UPDATED").capital(false).build())))
                 .andExpect(status().isOk());
     }
 

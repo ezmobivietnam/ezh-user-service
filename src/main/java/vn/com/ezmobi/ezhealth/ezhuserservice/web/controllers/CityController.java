@@ -5,9 +5,10 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelOneService;
+import vn.com.ezmobi.framework.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CityService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
+import vn.com.ezmobi.framework.web.controllers.AbstractLevelOneController;
 
 import javax.validation.Valid;
 import java.util.List;

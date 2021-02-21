@@ -6,8 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
+import vn.com.ezmobi.framework.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
+import vn.com.ezmobi.framework.web.controllers.AbstractLevelTwoController;
 
 import javax.validation.Valid;
 import java.util.List;

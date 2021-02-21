@@ -1,4 +1,4 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
+package vn.com.ezmobi.framework.web.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -8,12 +8,10 @@ import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseLevelTwoService;
+import vn.com.ezmobi.framework.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
-import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,10 +21,8 @@ import java.util.Optional;
  */
 @Slf4j
 @Validated
-public abstract class AbstractLevelTwoController<T extends RepresentationModel<? extends T>, ID> {
-
-    public static final int DEFAULT_PAGE_NUMBER = 0;
-    public static final int DEFAULT_PAGE_SIZE = 20;
+public abstract class AbstractLevelTwoController<T extends RepresentationModel<? extends T>, ID>
+        extends AbstractController {
 
     /**
      * Find and return a list of RepresentationModel.
@@ -52,9 +48,7 @@ public abstract class AbstractLevelTwoController<T extends RepresentationModel<?
         boolean isRequestPaging = Objects.nonNull(page) || Objects.nonNull(size);
         if (isRequestPaging) {
             // List with pagination
-            int actualPageNumber = Objects.isNull(page) ? DEFAULT_PAGE_NUMBER : page;
-            int actualPageSize = Objects.isNull(size) ? DEFAULT_PAGE_SIZE : size;
-            PageRequest requestPage = PageRequest.of(actualPageNumber, actualPageSize);
+            PageRequest requestPage = getPageRequest(page, size);
             CollectionModel<T> collectionModel = getService().findPaginated(rootId, levelOneId, withLevelTwoIds,
                     withText, requestPage);
             return ResponseEntity.ok(collectionModel);

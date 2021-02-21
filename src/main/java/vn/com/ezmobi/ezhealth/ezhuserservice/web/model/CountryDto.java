@@ -32,9 +32,14 @@ public class CountryDto extends RepresentationModel<CountryDto> {
     @Size(min = 1, max = 50)
     private String name;
 
+    private String description;
+
     @Null
     private Set<CityDto> cities;
 
     @Null
     private LocalDateTime lastUpdate;
+
+    @Null
+    private LocalDateTime creationDate;
 }

@@ -3,7 +3,6 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
@@ -33,7 +32,6 @@ import static org.mockito.Mockito.verify;
  * Created by ezmobivietnam on 2021-01-24.
  */
 @SpringBootTest
-@AutoConfigureMockMvc
 class CityServiceImplTest {
 
     @Autowired
@@ -317,7 +315,7 @@ class CityServiceImplTest {
         given(cityRepository.save(any()))
                 .willReturn(City.builder().id(1).name("New city").country(algeriaCountryEntity).build());
         //when
-        CityDto cityDto = cityService.addNew(2, CityDto.builder().name("New city").build());
+        CityDto cityDto = cityService.addNew(2, CityDto.builder().name("New city").capital(false).build());
         assertNotNull(cityDto);
         assertNotNull(cityDto.getId());
         assertNotNull(cityDto.getLink(IanaLinkRelations.SELF_VALUE));
@@ -329,7 +327,7 @@ class CityServiceImplTest {
     @Test
     void addNew_givenNullCountryId_thenThrowsException() {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            cityService.addNew(null, CityDto.builder().name("City name").build());
+            cityService.addNew(null, CityDto.builder().name("City name").capital(false).build());
         });
         String expectedMessage = "Country id must not be null!";
         String actualMessage = exception.getMessage();
@@ -375,7 +373,7 @@ class CityServiceImplTest {
         given(cityRepository.findByIdAndCountry_Id(anyInt(), anyInt())).willReturn(Optional.of(city01Entity));
         given(cityRepository.save(any())).willReturn(city01Entity);
         //when
-        CityDto updatedModel = cityService.update(2, CityDto.builder().name("New name").build(), 59);
+        CityDto updatedModel = cityService.update(2, CityDto.builder().name("New name").capital(false).build(), 59);
         //then
         assertNotNull(updatedModel);
         assertNotNull(updatedModel.getLink(IanaLinkRelations.SELF_VALUE));
@@ -391,7 +389,7 @@ class CityServiceImplTest {
         given(cityRepository.findByIdAndCountry_Id(anyInt(), anyInt())).willReturn(Optional.empty());
         //when
         Exception exception = assertThrows(TaskExecutionException.class, () -> {
-            cityService.update(2, CityDto.builder().name("New name").build(), 59);
+            cityService.update(2, CityDto.builder().name("New name").capital(false).build(), 59);
         });
         //then
         String expectedMessage = String.format("Failed to search the city [%d] of the country [%d]", 59, 2);
@@ -400,13 +398,20 @@ class CityServiceImplTest {
     }
 
     /**
+     * Given:
+     * 1. country id is null
+     * 2. Valid CityDto object
+     * 3. Valid city id
+     * <p>
+     * Then expect: IllegalArgumentException is thrown
+     * <p>
      * Target method: CityService.update(Integer countryId, CityDto cityDto, Integer cityId)
      */
     @Test
     void update_givenNullCountryID_thenThrowsException() {
         //given
         Integer countryId = null;
-        CityDto cityDto = CityDto.builder().name("City name").build();
+        CityDto cityDto = CityDto.builder().name("City name").capital(false).build();
         Integer cityId = 59;
         //when
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -438,13 +443,20 @@ class CityServiceImplTest {
     }
 
     /**
+     * Given:
+     * 1. Valid country id
+     * 2. Valid CityDto object
+     * 3. city id is null
+     * <p>
+     * Then expect: IllegalArgumentException is thrown
+     * <p>
      * Target method: CityService.update(Integer countryId, CityDto cityDto, Integer cityId)
      */
     @Test
     void update_givenNullCityId_thenThrowsException() {
         //given
         Integer countryId = 2;
-        CityDto cityDto = CityDto.builder().name("City name").build();
+        CityDto cityDto = CityDto.builder().name("City name").capital(false).build();
         Integer cityId = null;
         //when
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {

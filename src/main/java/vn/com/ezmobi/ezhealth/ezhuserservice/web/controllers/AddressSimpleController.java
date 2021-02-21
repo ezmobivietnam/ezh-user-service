@@ -5,8 +5,9 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.SimpleService;
+import vn.com.ezmobi.framework.services.SimpleService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
+import vn.com.ezmobi.framework.web.controllers.AbstractSimpleController;
 
 import java.util.List;
 

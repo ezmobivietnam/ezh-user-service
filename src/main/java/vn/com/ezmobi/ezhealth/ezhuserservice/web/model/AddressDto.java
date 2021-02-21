@@ -36,10 +36,13 @@ public class AddressDto extends RepresentationModel<AddressDto> {
     @Size(max = 10)
     private String postalCode;
 
-    @NotBlank
-    @Size(max = 20)
+//    @NotBlank
+//    @Size(max = 20)
     private String phone;
 
     @Null
     private LocalDateTime lastUpdate;
+
+    @Null
+    private LocalDateTime creationDate;
 }

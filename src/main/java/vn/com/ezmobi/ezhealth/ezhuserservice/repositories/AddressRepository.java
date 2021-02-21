@@ -2,14 +2,13 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.repositories;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import vn.com.ezmobi.ezhealth.ezhuserservice.domain.Address;
+import vn.com.ezmobi.framework.repositories.BaseEntityRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface AddressRepository extends JpaRepository<Address, Integer>, JpaSpecificationExecutor<Address> {
+public interface AddressRepository extends BaseEntityRepository<Address, Integer> {
 
     List<Address> findAllByCity_IdAndCity_Country_Id(Integer cityId, Integer countryId);
 
@@ -46,14 +45,13 @@ public interface AddressRepository extends JpaRepository<Address, Integer>, JpaS
     // JPA APIs for SimpleService
     //=================================================================================================================
     List<Address> findAllByIdInAndAddressContainingIgnoreCase(List<Integer> addressIds, String containingAddress);
+
     Page<Address> findAllByIdInAndAddressContainingIgnoreCase(List<Integer> addressIds, String containingAddress,
                                                               Pageable pageRequest);
 
-    List<Address> findAllByIdIn(List<Integer> addressIds);
-    Page<Address> findAllByIdIn(List<Integer> addressIds, Pageable pageRequest);
 
     List<Address> findAllByAddressContainingIgnoreCase(String havingAddress);
+
     Page<Address> findAllByAddressContainingIgnoreCase(String havingAddress, Pageable pageRequest);
 
-    void deleteAllByIdIn(List<Integer> ids);
 }

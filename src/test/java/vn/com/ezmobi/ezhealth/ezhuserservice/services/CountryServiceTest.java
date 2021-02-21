@@ -3,7 +3,6 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.services;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
@@ -36,7 +35,6 @@ import static org.mockito.Mockito.verify;
  * Created by ezmobivietnam on 2021-01-12.
  */
 @SpringBootTest
-@AutoConfigureMockMvc
 class CountryServiceTest {
 
     @MockBean

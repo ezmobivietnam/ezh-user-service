@@ -1,4 +1,4 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.services;
+package vn.com.ezmobi.framework.services;
 
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.validation.annotation.Validated;

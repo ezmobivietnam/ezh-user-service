@@ -1,11 +1,9 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
 import lombok.*;
-import org.hibernate.annotations.UpdateTimestamp;
+import vn.com.ezmobi.framework.domain.NamedEntity;
 
 import javax.persistence.*;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -14,26 +12,19 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "city")
-public class City implements Serializable {
+public class City extends NamedEntity {
 
     private static final long serialVersionUID = 1L;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "city_id", nullable = false)
-//    @EqualsAndHashCode.Include
-    private int id;
+    @Column(name = "is_capital", nullable = false)
+    private Boolean capital;
 
-    @Column(name = "city", nullable = false)
-    private String name;
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "country_id", nullable = false)
     private Country country;
-
-    @Column(name = "last_update", nullable = false)
-    @UpdateTimestamp
-    private LocalDateTime lastUpdate;
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
@@ -41,9 +32,10 @@ public class City implements Serializable {
     private Set<Address> addresses;
 
     @Builder
-    public City(int id, String name, Country country) {
-        this.id = id;
-        this.name = name;
+    public City(int id, String name, Boolean capital, Country country) {
+        super.setId(id);
+        super.setName(name);
+        this.capital = capital;
         this.country = country;
     }
 

@@ -1,4 +1,4 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
+package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.it;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +8,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.BaseControllerTest;
+import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.CountryController;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
 
 import javax.transaction.Transactional;
@@ -44,9 +47,9 @@ public class CountryControllerITTest extends BaseControllerTest {
      */
     @Test
     void findList_givenNoParamsUsed_thenReturnAllCountriesWithSelfLink() throws Exception {
-        mockMvc.perform(get(CountryController.BASE_URL).contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(MockMvcRequestBuilders.get(CountryController.BASE_URL).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(109)))
+                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(195)))
                 .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries")));
     }
 
@@ -103,32 +106,32 @@ public class CountryControllerITTest extends BaseControllerTest {
     /**
      * Given:
      * 1. Target endpoint {http://localhost:8080/api/countries} is used.
-     * 2. Parameters {page=1&size=5} is used
+     * 2. Parameters {page=1&size=20} is used
      * <p>
      * When:
      * 1. The endpoint is called by using the GET method
      * <p>
      * Then expect:
-     * 1. Client will receive the list of 05 countries of the page 01 in json format
+     * 1. Client will receive the list of 20 countries of the page 01 in json format
      * 2. The pagination links ("first, "prev", "self", "next, "last") link is added to the response
      *
      * @throws Exception
      */
     @Test
     void findList_givenPageAndSizeParamsUsed_thenReturnAllCountriesWithPaginationLinks() throws Exception {
-        String url = CountryController.BASE_URL + "?page=1&size=5";
+        String url = CountryController.BASE_URL + "?page=1&size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(5)))
-                .andExpect(jsonPath("$._links.first.href", containsStringIgnoringCase("/api/countries?page=0&size=5")))
-                .andExpect(jsonPath("$._links.prev.href", containsStringIgnoringCase("/api/countries?page=0&size=5")))
-                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?page=1&size=5")))
-                .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?page=2&size=5")))
-                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=21&size=5")))
+                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(20)))
+                .andExpect(jsonPath("$._links.first.href", containsStringIgnoringCase("/api/countries?page=0&size=20")))
+                .andExpect(jsonPath("$._links.prev.href", containsStringIgnoringCase("/api/countries?page=0&size=20")))
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?page=1&size=20")))
+                .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?page=2&size=20")))
+                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=9&size=20")))
                 .andExpect(jsonPath("$.page.number", is(1)))
-                .andExpect(jsonPath("$.page.size", is(5)))
-                .andExpect(jsonPath("$.page.totalElements", is(109)))
-                .andExpect(jsonPath("$.page.totalPages", is(22)))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(195)))
+                .andExpect(jsonPath("$.page.totalPages", is(10)))
         ;
     }
 
@@ -156,24 +159,24 @@ public class CountryControllerITTest extends BaseControllerTest {
                 .andExpect(jsonPath("$._links.prev.href", containsStringIgnoringCase("/api/countries?page=0&size=20")))
                 .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?page=1&size=20")))
                 .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?page=2&size=20")))
-                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=5&size=20")))
+                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=9&size=20")))
                 .andExpect(jsonPath("$.page.number", is(1)))
                 .andExpect(jsonPath("$.page.size", is(20)))
-                .andExpect(jsonPath("$.page.totalElements", is(109)))
-                .andExpect(jsonPath("$.page.totalPages", is(6)))
+                .andExpect(jsonPath("$.page.totalElements", is(195)))
+                .andExpect(jsonPath("$.page.totalPages", is(10)))
         ;
     }
 
     /**
      * Given:
      * 1. Target endpoint {http://localhost:8080/api/countries} is used.
-     * 2. Parameters {page=1} is used
+     * 2. Parameters {size=20} is used
      * <p>
      * When:
      * 1. The endpoint is called by using the GET method
      * <p>
      * Then expect:
-     * 1. Client will receive the list of 20 (default) countries of the page 01 in json format
+     * 1. Client will receive the list of 20 countries of the page 0 (default) in json format
      * 2. The pagination links ("first, "self", "next, "last") link is added to the response
      * 3. Note: the link "prev" is not existed
      *
@@ -181,25 +184,25 @@ public class CountryControllerITTest extends BaseControllerTest {
      */
     @Test
     void findList_givenSizeParamUsed_thenReturnAllCountriesWithDefaultPageAndPaginationLinks() throws Exception {
-        String url = CountryController.BASE_URL + "?size=5";
+        String url = CountryController.BASE_URL + "?size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(5)))
-                .andExpect(jsonPath("$._links.first.href", containsStringIgnoringCase("/api/countries?page=0&size=5")))
-                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?page=0&size=5")))
-                .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?page=1&size=5")))
-                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=21&size=5")))
+                .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(20)))
+                .andExpect(jsonPath("$._links.first.href", containsStringIgnoringCase("/api/countries?page=0&size=20")))
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?page=0&size=20")))
+                .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?page=1&size=20")))
+                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?page=9&size=20")))
                 .andExpect(jsonPath("$.page.number", is(0)))
-                .andExpect(jsonPath("$.page.size", is(5)))
-                .andExpect(jsonPath("$.page.totalElements", is(109)))
-                .andExpect(jsonPath("$.page.totalPages", is(22)))
+                .andExpect(jsonPath("$.page.size", is(20)))
+                .andExpect(jsonPath("$.page.totalElements", is(195)))
+                .andExpect(jsonPath("$.page.totalPages", is(10)))
         ;
     }
 
     /**
      * Given:
      * 1. Target endpoint {http://localhost:8080/api/countries} is used.
-     * 2. Two parameters {ids=101,102} and {name=united} are used
+     * 2. Two parameters {ids=185,186} and {name=united} are used
      * <p>
      * When:
      * 1. The endpoint is called by using the GET method
@@ -212,17 +215,20 @@ public class CountryControllerITTest extends BaseControllerTest {
      */
     @Test
     void findList_givenIdsParamAndNameParamUsed_thenReturnMatchedCountriesWithSelfLink() throws Exception {
-        String url = CountryController.BASE_URL + "?ids=101,102&name=united";
+        String url = CountryController.BASE_URL + "?ids=185,186&name=united";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(2)))
-                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?ids=101&ids=102&name=united")));
+                .andExpect(jsonPath("$._embedded.countryDtoList[0].name", is("United Arab Emirates")))
+                .andExpect(jsonPath("$._embedded.countryDtoList[1].name", is("United Kingdom")))
+                .andExpect(jsonPath("$._links.self.href",
+                        containsStringIgnoringCase("/api/countries?ids=185&ids=186&name=united")));
     }
 
     /**
      * Given:
      * 1. Target endpoint {http://localhost:8080/api/countries} is used.
-     * 2. ALL parameters {ids=101,102,103}, {name=united}, {page=0} and {size=2} are used
+     * 2. ALL parameters {ids=185,186,187}, {name=united}, {page=0} and {size=2} are used
      * <p>
      * When:
      * 1. The endpoint is called by using the GET method
@@ -236,14 +242,18 @@ public class CountryControllerITTest extends BaseControllerTest {
      */
     @Test
     void findList_givenAllParamsUsed_thenReturnMatchedCountriesWithPaginationLinks() throws Exception {
-        String url = CountryController.BASE_URL + "?ids=101,102,103&name=united&page=0&size=2";
+        String url = CountryController.BASE_URL + "?ids=185,186,187&name=united&page=0&size=2";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$._embedded.countryDtoList", hasSize(2)))
-                .andExpect(jsonPath("$._links.first.href", containsStringIgnoringCase("/api/countries?ids=101,102,103&name=united&page=0&size=2")))
-                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries?ids=101,102,103&name=united&page=0&size=2")))
-                .andExpect(jsonPath("$._links.next.href", containsStringIgnoringCase("/api/countries?ids=101,102,103&name=united&page=1&size=2")))
-                .andExpect(jsonPath("$._links.last.href", containsStringIgnoringCase("/api/countries?ids=101,102,103&name=united&page=1&size=2")))
+                .andExpect(jsonPath("$._links.first.href",
+                        containsStringIgnoringCase("/api/countries?ids=185,186,187&name=united&page=0&size=2")))
+                .andExpect(jsonPath("$._links.self.href",
+                        containsStringIgnoringCase("/api/countries?ids=185,186,187&name=united&page=0&size=2")))
+                .andExpect(jsonPath("$._links.next.href",
+                        containsStringIgnoringCase("/api/countries?ids=185,186,187&name=united&page=1&size=2")))
+                .andExpect(jsonPath("$._links.last.href",
+                        containsStringIgnoringCase("/api/countries?ids=185,186,187&name=united&page=1&size=2")))
                 .andExpect(jsonPath("$.page.number", is(0)))
                 .andExpect(jsonPath("$.page.size", is(2)))
                 .andExpect(jsonPath("$.page.totalElements", is(3)))
@@ -253,8 +263,8 @@ public class CountryControllerITTest extends BaseControllerTest {
 
     /**
      * Given:
-     * 1. Target endpoint {http://localhost:8080/api/countries/105} is used.
-     * 2. Country with id 105 existed in DB
+     * 1. Target endpoint {http://localhost:8080/api/countries/192} is used.
+     * 2. Country with id 192 existed in DB
      * <p>
      * When:
      * 1. The endpoint is called by using the GET method
@@ -267,13 +277,13 @@ public class CountryControllerITTest extends BaseControllerTest {
      */
     @Test
     void findById() throws Exception {
-        String findByIdlUrl = CountryController.BASE_URL + "/105";
+        String findByIdlUrl = CountryController.BASE_URL + "/192";
         mockMvc.perform(get(findByIdlUrl).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(105)))
+                .andExpect(jsonPath("$.id", is(192)))
                 .andExpect(jsonPath("$.name", is("Vietnam")))
                 .andExpect(jsonPath("$.lastUpdate", notNullValue()))
-                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries/105")));
+                .andExpect(jsonPath("$._links.self.href", containsStringIgnoringCase("/api/countries/192")));
         ;
     }
 
@@ -336,7 +346,6 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
-//    @DirtiesContext
     @Rollback(true)
     void addNew_givenValidCountryDtoInJsonFormat_thenReturnStatus201WithLocationHeaderFieldURL() throws Exception {
         String postURL = CountryController.BASE_URL;
@@ -345,7 +354,7 @@ public class CountryControllerITTest extends BaseControllerTest {
                 post(postURL).contentType(MediaType.APPLICATION_JSON).content(asJsonString(newCountry)))
                 .andExpect(status().isCreated())
                 .andExpect(header().exists("Location"))
-                .andExpect(header().string(HttpHeaders.LOCATION, containsString(CountryController.BASE_URL + "/110")))
+                .andExpect(header().string(HttpHeaders.LOCATION, containsString(CountryController.BASE_URL + "/196")))
         ;
     }
 

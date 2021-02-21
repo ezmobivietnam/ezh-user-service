@@ -1,11 +1,11 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
+package vn.com.ezmobi.framework.web.controllers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.SimpleService;
+import vn.com.ezmobi.framework.services.SimpleService;
 
 import java.util.List;
 import java.util.Objects;
@@ -14,9 +14,8 @@ import java.util.Objects;
  * Created by ezmobivietnam on 2021-01-19.
  */
 @Slf4j
-public abstract class AbstractSimpleController<T extends RepresentationModel<? extends T>, ID> {
-    public static final int DEFAULT_PAGE_NUMBER = 0;
-    public static final int DEFAULT_PAGE_SIZE = 20;
+public abstract class AbstractSimpleController<T extends RepresentationModel<? extends T>, ID>
+        extends AbstractController {
 
     /**
      * Find and return a list of data.
@@ -31,9 +30,7 @@ public abstract class AbstractSimpleController<T extends RepresentationModel<? e
         boolean isRequestPaging = Objects.nonNull(page) || Objects.nonNull(size);
         if (isRequestPaging) {
             // List with pagination
-            int actualPageNumber = Objects.isNull(page) ? DEFAULT_PAGE_NUMBER : page;
-            int actualPageSize = Objects.isNull(size) ? DEFAULT_PAGE_SIZE : size;
-            PageRequest requestPage = PageRequest.of(actualPageNumber, actualPageSize);
+            PageRequest requestPage = getPageRequest(page, size);
             CollectionModel<T> collectionModel = getService().findPaginated(withIds, withText, requestPage);
             return ResponseEntity.ok(collectionModel);
         } else {

@@ -1,9 +1,10 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.services;
+package vn.com.ezmobi.framework.services;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.validation.annotation.Validated;
+import vn.com.ezmobi.framework.services.SimpleService;
 
 import javax.validation.Valid;
 import java.util.List;

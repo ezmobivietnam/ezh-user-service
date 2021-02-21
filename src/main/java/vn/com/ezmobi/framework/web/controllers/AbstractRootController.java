@@ -1,10 +1,10 @@
-package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
+package vn.com.ezmobi.framework.web.controllers;
 
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import vn.com.ezmobi.ezhealth.ezhuserservice.services.BaseRootService;
+import vn.com.ezmobi.framework.services.BaseRootService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.exceptions.DataNotFoundException;
 
 import javax.validation.Valid;
