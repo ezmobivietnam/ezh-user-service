@@ -1,16 +1,12 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.web.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.hateoas.RepresentationModel;
+import vn.com.ezmobi.framework.web.model.NamedDto;
 
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 import java.util.Set;
 
 /**
@@ -20,26 +16,18 @@ import java.util.Set;
  */
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @JsonIgnoreProperties(value = {"cities"})
-public class CountryDto extends RepresentationModel<CountryDto> {
-
-    @Null
-    private Integer id;
-
-    @NotNull
-    @Size(min = 1, max = 50)
-    private String name;
+public class CountryDto extends NamedDto<CountryDto> {
 
     private String description;
-
     @Null
     private Set<CityDto> cities;
 
-    @Null
-    private LocalDateTime lastUpdate;
-
-    @Null
-    private LocalDateTime creationDate;
+    @Builder
+    public CountryDto(Integer id, String name, String description, Set<CityDto> cities) {
+        super.setId(id);
+        super.setName(name);
+        this.description = description;
+        this.cities = cities;
+    }
 }

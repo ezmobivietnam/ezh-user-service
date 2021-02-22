@@ -16,6 +16,13 @@ public class Country extends NamedEntity {
 
     private static final long serialVersionUID = 1L;
 
+    @Builder
+    public Country(int id, String name, Set<City> cities) {
+        super.setId(id);
+        super.setName(name);
+        this.cities = cities;
+    }
+
     @Column(name = "description")
     private String description;
 
@@ -23,14 +30,6 @@ public class Country extends NamedEntity {
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "country", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<City> cities;
-
-    @Builder
-    public Country(int id, String name, Set<City> cities) {
-        super.setId(id);
-        ;
-        super.setName(name);
-        this.cities = cities;
-    }
 
     public Set<City> getCities() {
         if (Objects.isNull(this.cities)) {
