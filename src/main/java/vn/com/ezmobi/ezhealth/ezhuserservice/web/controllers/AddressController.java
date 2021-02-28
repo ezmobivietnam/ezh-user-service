@@ -47,7 +47,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
             @PathVariable Integer countryId,
             @PathVariable Integer cityId,
             @RequestParam(name = "ids", required = false) List<Integer> withAddressIds,
-            @RequestParam(name = "address", required = false) String withAddress,
+            @RequestParam(name = "withText", required = false) String withAddress,
             @RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "size", required = false) Integer size) {
         return super.findList(countryId, cityId, withAddressIds, withAddress, page, size);

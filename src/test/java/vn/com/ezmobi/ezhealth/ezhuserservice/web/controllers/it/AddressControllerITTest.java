@@ -66,7 +66,7 @@ public class AddressControllerITTest {
      * @throws Exception
      */
     @Test
-    void findList_givenPageAndSizeParamsSpecified_thenReturnCorrespondingDataWithPagination() throws Exception {
+    void findList_givenParamsPageAndSizeSpecified_thenReturnCorrespondingDataWithPagination() throws Exception {
         String url = "/api/countries/192/cities/58/addresses?page=0&size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -85,4 +85,5 @@ public class AddressControllerITTest {
                 .andExpect(jsonPath("$.page.totalPages", is(2)))
         ;
     }
+
 }
