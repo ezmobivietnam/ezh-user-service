@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import javax.transaction.Transactional;
@@ -40,6 +41,7 @@ public class AddressControllerITTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "address:read")
     void findList_givenNoParamsSpecified_thenReturnAllDataWithSelfLink() throws Exception {
         String url = "/api/countries/192/cities/58/addresses";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -66,6 +68,7 @@ public class AddressControllerITTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "address:read")
     void findList_givenParamsPageAndSizeSpecified_thenReturnCorrespondingDataWithPagination() throws Exception {
         String url = "/api/countries/192/cities/58/addresses?page=0&size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))

@@ -1,9 +1,12 @@
 package vn.com.ezmobi.ezhealth.ezhuserservice.domain;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import vn.com.ezmobi.framework.domain.BaseEntity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Data
 @Entity
@@ -30,4 +33,10 @@ public class Address extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<User> users;
+
 }

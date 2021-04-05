@@ -3,11 +3,12 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import vn.com.ezmobi.framework.services.BaseRootService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CountryService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CountryDto;
+import vn.com.ezmobi.framework.services.BaseRootService;
 import vn.com.ezmobi.framework.web.controllers.AbstractRootController;
 
 import javax.validation.Valid;
@@ -41,6 +42,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
      */
     @Override
     @GetMapping()
+    @PreAuthorize("hasAuthority('country:read')")
     public ResponseEntity<CollectionModel<CountryDto>> findList(
             @RequestParam(name = "ids", required = false) List<Integer> withIds,
             @RequestParam(name = "name", required = false) String withText,
@@ -52,6 +54,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
     }
 
     @GetMapping("/{countryId}")
+    @PreAuthorize("hasAuthority('country:read')")
     public ResponseEntity<CountryDto> findById(@PathVariable Integer countryId) {
         log.debug("Start finding country (" + countryId + ")");
         return super.findById(countryId);
@@ -59,6 +62,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
 
     @Override
     @PostMapping()
+    @PreAuthorize("hasAuthority('country:write')")
     public ResponseEntity<Void> addNew(@Valid @RequestBody CountryDto country) {
         log.debug("Starting adding new country:", country);
         return super.addNew(country);
@@ -66,6 +70,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
 
     @Override
     @PutMapping("/{countryId}")
+    @PreAuthorize("hasAuthority('country:write')")
     public ResponseEntity<Void> update(@RequestBody @Valid CountryDto country,
                                        @PathVariable Integer countryId) {
         log.debug(String.format("Start updating country with id: %d with new data: %s", countryId, country));
@@ -74,6 +79,7 @@ public class CountryController extends AbstractRootController<CountryDto, Intege
 
     @Override
     @DeleteMapping("/{countryId}")
+    @PreAuthorize("hasAuthority('country:delete')")
     public ResponseEntity<Void> delete(@PathVariable Integer countryId) {
         log.debug(String.format("Start deleting country with id [%d]", countryId));
         return super.delete(countryId);

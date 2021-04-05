@@ -3,9 +3,9 @@
 -- Model: New Model    Version: 1.0
 -- MySQL Workbench Forward Engineering
 
--- SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
--- SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
--- SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
 
 -- -----------------------------------------------------
 -- Schema ezhusers
@@ -15,8 +15,7 @@ DROP SCHEMA IF EXISTS `ezhusers` ;
 -- -----------------------------------------------------
 -- Schema ezhusers
 -- -----------------------------------------------------
--- CREATE SCHEMA IF NOT EXISTS `ezhusers` DEFAULT CHARACTER SET utf8 ;
-CREATE SCHEMA IF NOT EXISTS `ezhusers` ;
+CREATE SCHEMA IF NOT EXISTS `ezhusers` DEFAULT CHARACTER SET utf8 ;
 USE `ezhusers` ;
 
 -- -----------------------------------------------------
@@ -31,10 +30,9 @@ CREATE TABLE IF NOT EXISTS `country` (
   `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`))
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE UNIQUE INDEX `name_UNIQUE` ON `country` (`name` ASC) VISIBLE;
+CREATE UNIQUE INDEX `name_UNIQUE` ON `country` (`name` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -56,12 +54,11 @@ CREATE TABLE IF NOT EXISTS `city` (
     REFERENCES `country` (`id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE UNIQUE INDEX `name_UNIQUE` ON `city` (`name` ASC) VISIBLE;
+CREATE UNIQUE INDEX `name_UNIQUE` ON `city` (`name` ASC) VISIBLE;
 
--- CREATE INDEX `fk_city_country_idx` ON `city` (`country_id` ASC) VISIBLE;
+CREATE INDEX `fk_city_country_idx` ON `city` (`country_id` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -85,10 +82,9 @@ CREATE TABLE IF NOT EXISTS `address` (
     REFERENCES `city` (`id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE INDEX `fk_address_city_idx` ON `address` (`city_id` ASC) VISIBLE;
+CREATE INDEX `fk_address_city_idx` ON `address` (`city_id` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -116,12 +112,11 @@ CREATE TABLE IF NOT EXISTS `user` (
     REFERENCES `address` (`id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE UNIQUE INDEX `email_UNIQUE` ON `user` (`email` ASC) VISIBLE;
+CREATE UNIQUE INDEX `email_UNIQUE` ON `user` (`email` ASC) VISIBLE;
 
--- CREATE INDEX `fk_user_address1_idx` ON `user` (`address_id` ASC) VISIBLE;
+CREATE INDEX `fk_user_address1_idx` ON `user` (`address_id` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -131,14 +126,13 @@ DROP TABLE IF EXISTS `role` ;
 
 CREATE TABLE IF NOT EXISTS `role` (
   `id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
   `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`))
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE UNIQUE INDEX `name_UNIQUE` ON `role` (`name` ASC) VISIBLE;
+CREATE UNIQUE INDEX `name_UNIQUE` ON `role` (`name` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -148,14 +142,13 @@ DROP TABLE IF EXISTS `privilege` ;
 
 CREATE TABLE IF NOT EXISTS `privilege` (
   `id` TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `name` VARCHAR(45) NOT NULL,
+  `name` VARCHAR(50) NOT NULL,
   `last_update` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`))
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE UNIQUE INDEX `id_UNIQUE` ON `privilege` (`id` ASC) VISIBLE;
+CREATE UNIQUE INDEX `id_UNIQUE` ON `privilege` (`id` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -178,12 +171,11 @@ CREATE TABLE IF NOT EXISTS `users_roles` (
     REFERENCES `role` (`id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE INDEX `fk_user_has_role_role1_idx` ON `users_roles` (`role_id` ASC) VISIBLE;
+CREATE INDEX `fk_user_has_role_role1_idx` ON `users_roles` (`role_id` ASC) VISIBLE;
 
--- CREATE INDEX `fk_user_has_role_user1_idx` ON `users_roles` (`user_id` ASC) VISIBLE;
+CREATE INDEX `fk_user_has_role_user1_idx` ON `users_roles` (`user_id` ASC) VISIBLE;
 
 
 -- -----------------------------------------------------
@@ -205,14 +197,13 @@ CREATE TABLE IF NOT EXISTS `roles_privileges` (
     REFERENCES `privilege` (`id`)
     ON DELETE RESTRICT
     ON UPDATE CASCADE)
--- ENGINE = InnoDB
-;
+ENGINE = InnoDB;
 
--- CREATE INDEX `fk_role_has_privilege_privilege1_idx` ON `roles_privileges` (`privilege_id` ASC) VISIBLE;
+CREATE INDEX `fk_role_has_privilege_privilege1_idx` ON `roles_privileges` (`privilege_id` ASC) VISIBLE;
 
--- CREATE INDEX `fk_role_has_privilege_role1_idx` ON `roles_privileges` (`role_id` ASC) VISIBLE;
+CREATE INDEX `fk_role_has_privilege_role1_idx` ON `roles_privileges` (`role_id` ASC) VISIBLE;
 
 
--- SET SQL_MODE=@OLD_SQL_MODE;
--- SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
--- SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

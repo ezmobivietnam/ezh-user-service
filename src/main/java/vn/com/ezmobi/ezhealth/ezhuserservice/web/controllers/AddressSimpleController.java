@@ -3,10 +3,11 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
-import vn.com.ezmobi.framework.services.SimpleService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
+import vn.com.ezmobi.framework.services.SimpleService;
 import vn.com.ezmobi.framework.web.controllers.AbstractSimpleController;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class AddressSimpleController extends AbstractSimpleController<AddressDto
      */
     @Override
     @GetMapping
+    @PreAuthorize("hasAuthority('address:read')")
     public ResponseEntity<CollectionModel<AddressDto>> findList(
             @RequestParam(name = "ids", required = false) List<Integer> withIds,
             @RequestParam(name = "withText", required = false) String withText,
@@ -49,6 +51,7 @@ public class AddressSimpleController extends AbstractSimpleController<AddressDto
 
     @Override
     @DeleteMapping
+    @PreAuthorize("hasAuthority('address:delete')")
     public ResponseEntity<Void> delete(@RequestParam(name = "ids", required = false) List<Integer> addressIds) {
         return super.delete(addressIds);
     }

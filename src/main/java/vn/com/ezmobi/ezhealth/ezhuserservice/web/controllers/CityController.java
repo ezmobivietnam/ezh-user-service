@@ -3,11 +3,12 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import vn.com.ezmobi.framework.services.BaseLevelOneService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.CityService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.CityDto;
+import vn.com.ezmobi.framework.services.BaseLevelOneService;
 import vn.com.ezmobi.framework.web.controllers.AbstractLevelOneController;
 
 import javax.validation.Valid;
@@ -63,6 +64,7 @@ public class CityController extends AbstractLevelOneController<CityDto, Integer>
 
     @Override
     @GetMapping("/{cityId}")
+    @PreAuthorize("hasAuthority('city:read')")
     public ResponseEntity<CityDto> findById(@PathVariable Integer countryId,
                                             @PathVariable Integer cityId) {
         log.debug(String.format("Country id=%s, city id=%s", countryId, cityId));
@@ -71,12 +73,14 @@ public class CityController extends AbstractLevelOneController<CityDto, Integer>
 
     @Override
     @PostMapping()
+    @PreAuthorize("hasAuthority('city:write')")
     public ResponseEntity<Void> addNew(@PathVariable Integer countryId, @RequestBody @Valid CityDto model) {
         log.debug(String.format("Adding to the country [%d] the new city [%s]", countryId, model));
         return super.addNew(countryId, model);
     }
 
     @PutMapping("/{cityId}")
+    @PreAuthorize("hasAuthority('city:write')")
     public ResponseEntity<Void> update(@PathVariable Integer countryId,
                                        @RequestBody @Valid CityDto model,
                                        @PathVariable Integer cityId) {
@@ -87,6 +91,7 @@ public class CityController extends AbstractLevelOneController<CityDto, Integer>
 
     @Override
     @DeleteMapping("/{cityId}")
+    @PreAuthorize("hasAuthority('city:delete')")
     public ResponseEntity<Void> delete(@PathVariable Integer countryId, @PathVariable Integer cityId) {
         return super.delete(countryId, cityId);
     }

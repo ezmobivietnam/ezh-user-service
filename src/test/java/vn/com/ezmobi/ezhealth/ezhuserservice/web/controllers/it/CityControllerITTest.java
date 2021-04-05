@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers.BaseControllerTest;
@@ -40,6 +41,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * 2. The "self" link is added to the response
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenNoParamsUsed_thenReturnAllCitiesWithSelfLink() throws Exception {
         String url = "/api/countries/192/cities";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -65,6 +67,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenPageAndSizeParamsUsed_thenReturnAllCitiesWithPaginationLinks() throws Exception {
         String url = "/api/countries/192/cities?page=1&size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -102,6 +105,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenIdsParamsUsed_thenReturnIdentifiedCitiesWithSelfLink() throws Exception {
         String url = "/api/countries/192/cities?ids=1,2,3,4,5";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -126,6 +130,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenNameParamUsed_thenReturnMatchedCitiesWithSelfLink() throws Exception {
         String url = "/api/countries/192/cities?name=Hà";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -159,6 +164,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenIdsParamAndNameParamUsed_thenReturnMatchedCitiesWithSelfLink() throws Exception {
         String url = "/api/countries/192/cities?ids=23,24&name=Hà";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -188,6 +194,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findList_givenAllParamsUsed_thenReturnMatchedCitiesWithPaginationLinks() throws Exception {
         String url = "/api/countries/192/cities?ids=22,23,24,25&name=Hà&page=0&size=2";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -229,6 +236,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findById() throws Exception {
         String findByIdlUrl = "/api/countries/192/cities/58";
         mockMvc.perform(get(findByIdlUrl).contentType(MediaType.APPLICATION_JSON))
@@ -237,7 +245,7 @@ public class CityControllerITTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.name", is("TP Hồ Chí Minh")))
                 .andExpect(jsonPath("$.capital", notNullValue()))
                 .andExpect(jsonPath("$.lastUpdate", notNullValue()))
-                .andExpect(jsonPath("$.creationDate", notNullValue()))
+                .andExpect(jsonPath("$.createdDate", notNullValue()))
                 .andExpect(jsonPath("$._links.self.href",
                         containsStringIgnoringCase("/api/countries/192/cities/58")))
                 .andExpect(jsonPath("$._links.country.href",
@@ -260,6 +268,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findById_givenNotExistedCityId_thenReturnStatus204() throws Exception {
         // given
         String findByIdlUrl = "/api/countries/192/cities/1000";
@@ -283,6 +292,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:read")
     void findById_givenInvalidCountryId_thenReturnErrorCode400() throws Exception {
         // given
         String findByIdlUrl = "/api/countries/192/cities/AAA";
@@ -306,6 +316,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:write")
     @Rollback
     void addNew_givenValidCityDtoInJsonFormat_thenReturnStatus201WithLocationHeaderFieldURL() throws Exception {
         String postURL = "/api/countries/192/cities";
@@ -332,6 +343,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:write")
     void addNew_givenCityDtoContainsId_thenReturnStatus400() throws Exception {
         String postURL = "/api/countries/192/cities";
         CityDto newCity = CityDto.builder().id(192).name("NEW City").capital(false).build();
@@ -357,6 +369,7 @@ public class CityControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "city:write")
     void addNew_givenCityDtoContainsEmptyName_thenReturnStatus400() throws Exception {
         String postURL = "/api/countries/192/cities";
         CityDto newCity = CityDto.builder().name("").capital(false).build();
@@ -384,6 +397,7 @@ public class CityControllerITTest extends BaseControllerTest {
      */
     @Rollback
     @Test
+    @WithMockUser(authorities = {"city:write", "city:read"})
     void update_ValidCityDtoInJsonFormat_thenReturnStatus200() throws Exception {
         String url = "/api/countries/192/cities/58";
         String updatedName = "TP Hồ Chí Minh (Updated)";
@@ -399,7 +413,7 @@ public class CityControllerITTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.name", is(updatedName)))
                 .andExpect(jsonPath("$.capital", notNullValue()))
                 .andExpect(jsonPath("$.lastUpdate", notNullValue()))
-                .andExpect(jsonPath("$.creationDate", notNullValue()))
+                .andExpect(jsonPath("$.createdDate", notNullValue()))
                 .andExpect(jsonPath("$._links.self.href",
                         containsStringIgnoringCase("/api/countries/192/cities/58")))
                 .andExpect(jsonPath("$._links.country.href",
@@ -407,6 +421,7 @@ public class CityControllerITTest extends BaseControllerTest {
     }
 
     @Test
+    @WithMockUser(authorities = {"city:delete", "city:read"})
     @Rollback
     void delete_givenValidCityId_thenReturnStatus202() throws Exception {
         String url = "/api/countries/192/cities/58";

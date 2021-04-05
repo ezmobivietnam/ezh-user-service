@@ -6,6 +6,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -46,6 +47,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenNoParamsUsed_thenReturnAllCountriesWithSelfLink() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(CountryController.BASE_URL).contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -68,6 +70,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenIdsParamsUsed_thenReturnIdentifiedCountriesWithSelfLink() throws Exception {
         String url = CountryController.BASE_URL + "?ids=1,2,3,4,5";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -91,6 +94,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenNameParamUsed_thenReturnMatchedCountriesWithSelfLink() throws Exception {
         String url = CountryController.BASE_URL + "?name=united";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -118,6 +122,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenPageAndSizeParamsUsed_thenReturnAllCountriesWithPaginationLinks() throws Exception {
         String url = CountryController.BASE_URL + "?page=1&size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -150,6 +155,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenPageParamUsed_thenReturnAllCountriesWithDefaultSizeAndPaginationLinks() throws Exception {
         String url = CountryController.BASE_URL + "?page=1";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -183,6 +189,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenSizeParamUsed_thenReturnAllCountriesWithDefaultPageAndPaginationLinks() throws Exception {
         String url = CountryController.BASE_URL + "?size=20";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -214,6 +221,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenIdsParamAndNameParamUsed_thenReturnMatchedCountriesWithSelfLink() throws Exception {
         String url = CountryController.BASE_URL + "?ids=185,186&name=united";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -241,6 +249,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findList_givenAllParamsUsed_thenReturnMatchedCountriesWithPaginationLinks() throws Exception {
         String url = CountryController.BASE_URL + "?ids=185,186,187&name=united&page=0&size=2";
         mockMvc.perform(get(url).contentType(MediaType.APPLICATION_JSON))
@@ -276,6 +285,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findById() throws Exception {
         String findByIdlUrl = CountryController.BASE_URL + "/192";
         mockMvc.perform(get(findByIdlUrl).contentType(MediaType.APPLICATION_JSON))
@@ -301,6 +311,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findById_givenNotExistedCountryId_thenReturnNoContentWithStatus204() throws Exception {
         // given
         String findByIdlUrl = CountryController.BASE_URL + "/1000";
@@ -322,6 +333,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:read")
     void findById_givenInvalidCountryId_thenReturnErrorCode400() throws Exception {
         // given
         String findByIdlUrl = CountryController.BASE_URL + "/AAA";
@@ -346,6 +358,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:write")
     @Rollback(true)
     void addNew_givenValidCountryDtoInJsonFormat_thenReturnStatus201WithLocationHeaderFieldURL() throws Exception {
         String postURL = CountryController.BASE_URL;
@@ -373,6 +386,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:write")
     void addNew_givenCountryDtoContainsId_thenReturnStatus400() throws Exception {
         String postURL = CountryController.BASE_URL;
         CountryDto newCountry = CountryDto.builder().id(110).name("NEW country").build();
@@ -398,6 +412,7 @@ public class CountryControllerITTest extends BaseControllerTest {
      * @throws Exception
      */
     @Test
+    @WithMockUser(authorities = "country:write")
     void addNew_givenCountryDtoContainsEmptyName_thenReturnStatus400() throws Exception {
         String postURL = CountryController.BASE_URL;
         CountryDto newCountry = CountryDto.builder().name("").build();

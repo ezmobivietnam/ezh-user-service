@@ -26,6 +26,6 @@ public class BaseEntity implements Serializable {
     private LocalDateTime lastUpdate;
 
     @CreationTimestamp
-    @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate;
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
 }

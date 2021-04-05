@@ -21,5 +21,5 @@ public class BaseDto<T extends RepresentationModel<? extends T>> extends Represe
     private LocalDateTime lastUpdate;
 
     @Null
-    private LocalDateTime creationDate;
+    private LocalDateTime createdDate;
 }

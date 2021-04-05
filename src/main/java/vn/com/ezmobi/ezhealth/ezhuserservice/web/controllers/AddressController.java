@@ -3,11 +3,12 @@ package vn.com.ezmobi.ezhealth.ezhuserservice.web.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import vn.com.ezmobi.ezhealth.ezhuserservice.services.AddressService;
-import vn.com.ezmobi.framework.services.BaseLevelTwoService;
 import vn.com.ezmobi.ezhealth.ezhuserservice.web.model.AddressDto;
+import vn.com.ezmobi.framework.services.BaseLevelTwoService;
 import vn.com.ezmobi.framework.web.controllers.AbstractLevelTwoController;
 
 import javax.validation.Valid;
@@ -43,6 +44,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
      */
     @Override
     @GetMapping
+    @PreAuthorize("hasAuthority('address:read')")
     public ResponseEntity<CollectionModel<AddressDto>> findList(
             @PathVariable Integer countryId,
             @PathVariable Integer cityId,
@@ -55,6 +57,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
 
     @Override
     @GetMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('address:read')")
     public ResponseEntity<AddressDto> findById(
             @PathVariable Integer countryId,
             @PathVariable Integer cityId,
@@ -65,6 +68,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
 
     @Override
     @PostMapping
+    @PreAuthorize("hasAuthority('address:write')")
     public ResponseEntity<Void> addNew(@PathVariable Integer countryId,
                                        @PathVariable Integer cityId,
                                        @RequestBody @Valid AddressDto model) {
@@ -73,6 +77,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
 
     @Override
     @PutMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('address:write')")
     public ResponseEntity<Void> update(@PathVariable Integer countryId,
                                        @PathVariable Integer cityId,
                                        @RequestBody @Valid AddressDto model,
@@ -82,6 +87,7 @@ public class AddressController extends AbstractLevelTwoController<AddressDto, In
 
     @Override
     @DeleteMapping("/{addressId}")
+    @PreAuthorize("hasAuthority('address:delete')")
     public ResponseEntity<Void> delete(@PathVariable Integer countryId,
                                        @PathVariable Integer cityId,
                                        @PathVariable Integer addressId) {
