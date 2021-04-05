@@ -11,7 +11,6 @@ public class JwtSecretKey {
 
     private final JwtConfig jwtConfig;
 
-//    @Autowired
     public JwtSecretKey(JwtConfig jwtConfig) {
         this.jwtConfig = jwtConfig;
     }
